@@ -50,7 +50,9 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, inventory, repai
 
   const inventoryCounts = useMemo(() => {
     return inventory.reduce((acc, part) => {
-        acc[part] = (acc[part] || 0) + 1;
+        if (part) { // Defensive check
+            acc[part] = (acc[part] || 0) + 1;
+        }
         return acc;
     }, {} as Record<PartType, number>);
   }, [inventory]);
@@ -157,9 +159,13 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, inventory, repai
                 <tbody>
                     {sellableParts.map(partType => {
                         const storeItem = PARTS_CATALOG.find(p => p.id === partType);
+                        
+                        // CRITICAL FIX: If a part in inventory doesn't exist in the catalog,
+                        // skip rendering it to prevent a crash.
                         if (!storeItem) {
-                          return null; // Evita que o aplicativo quebre se a peça não for encontrada
+                          return null;
                         }
+
                         const price = sellPrices[partType] || Math.floor(storeItem.price * 0.5);
 
                         return (
