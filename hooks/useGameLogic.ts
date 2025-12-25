@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import type { Device, DevicePart, PartType, StoreItem } from '../types';
+import type { Device, DevicePart, PartType, StoreItem, WorkbenchPart } from '../types';
 import { INITIAL_MONEY } from '../constants';
 import { PartType as PartTypeEnum } from '../types';
 
@@ -81,7 +81,7 @@ const checkWinCondition = (device: Device | null): boolean => {
 
 interface GameLogicState {
     money: number;
-    inventory: PartType[];
+    workbenchParts: WorkbenchPart[];
     currentDevice: Device | null;
     repairedDevices: Device[];
     roundCompleted: boolean;
@@ -91,7 +91,7 @@ interface GameLogicState {
 
 const initialState: GameLogicState = {
     money: INITIAL_MONEY,
-    inventory: [],
+    workbenchParts: [],
     currentDevice: null,
     repairedDevices: [],
     roundCompleted: false,
@@ -139,10 +139,11 @@ export default function useGameLogic() {
         setState(prevState => {
             if (prevState.money >= item.price) {
                 success = true;
+                const newPart: WorkbenchPart = { id: `new-${item.id}-${Date.now()}`, type: item.id };
                 return {
                     ...prevState,
                     money: prevState.money - item.price,
-                    inventory: [...prevState.inventory, item.id],
+                    workbenchParts: [...prevState.workbenchParts, newPart],
                 };
             }
             return prevState;
@@ -159,10 +160,11 @@ export default function useGameLogic() {
         setState(prevState => {
             if (prevState.money >= craftingCost) {
                 success = true;
+                 const newPart: WorkbenchPart = { id: `new-${item.id}-${Date.now()}`, type: item.id };
                 return {
                     ...prevState,
                     money: prevState.money - craftingCost,
-                    inventory: [...prevState.inventory, item.id],
+                    workbenchParts: [...prevState.workbenchParts, newPart],
                 };
             }
             return prevState;
@@ -183,17 +185,17 @@ export default function useGameLogic() {
         const saleId = `${partType}-${Date.now()}`;
         
         setState(prevState => {
-            const inventoryIndex = prevState.inventory.lastIndexOf(partType);
-            if (inventoryIndex === -1) {
+            const partIndex = prevState.workbenchParts.findIndex(p => p.type === partType);
+            if (partIndex === -1) {
                 return prevState;
             }
             success = true;
-            const newInventory = [...prevState.inventory];
-            newInventory.splice(inventoryIndex, 1);
+            const newWorkbenchParts = [...prevState.workbenchParts];
+            newWorkbenchParts.splice(partIndex, 1);
             const newSellingItem = { part: partType, price, id: saleId };
             return {
                 ...prevState,
-                inventory: newInventory,
+                workbenchParts: newWorkbenchParts,
                 sellingItems: [...prevState.sellingItems, newSellingItem],
             };
         });
@@ -227,31 +229,30 @@ export default function useGameLogic() {
         });
     }, []);
 
-    const swapPart = useCallback((partId: string) => {
+    const installNewPart = useCallback((newPartId: string) => {
         setState(prevState => {
-            const { currentDevice, inventory } = prevState;
+            const { currentDevice, workbenchParts } = prevState;
             if (!currentDevice) return prevState;
+            
+            const newPart = workbenchParts.find(p => p.id === newPartId);
+            if (!newPart) return prevState;
 
-            const partToSwap = currentDevice.parts.find(p => p.id === partId);
-            if (!partToSwap || !partToSwap.isBroken) return prevState;
-
-            const inventoryIndex = inventory.indexOf(partToSwap.type);
-            if (inventoryIndex === -1) {
-                alert(`Você precisa de uma peça '${partToSwap.type}' nova no inventário!`);
+            const brokenPartIndex = currentDevice.parts.findIndex(p => p.type === newPart.type && p.isBroken);
+            if (brokenPartIndex === -1) {
+                 alert("Não há uma peça quebrada correspondente para instalar esta peça nova.");
                 return prevState;
             }
 
-            const newInventory = [...inventory];
-            newInventory.splice(inventoryIndex, 1);
+            const newWorkbenchParts = workbenchParts.filter(p => p.id !== newPartId);
 
-            const newParts = currentDevice.parts.map(p =>
-                p.id === partId ? { ...p, isBroken: false } : p
-            );
+            const newParts = [...currentDevice.parts];
+            newParts[brokenPartIndex] = { ...newParts[brokenPartIndex], isBroken: false };
+            
             const newDevice = { ...currentDevice, parts: newParts };
             
             return {
                 ...prevState,
-                inventory: newInventory,
+                workbenchParts: newWorkbenchParts,
                 currentDevice: newDevice,
                 roundCompleted: prevState.roundCompleted || checkWinCondition(newDevice),
             };
@@ -273,7 +274,7 @@ export default function useGameLogic() {
         craftPart,
         sellPart,
         togglePartAttachment,
-        swapPart,
+        installNewPart,
         signSponsorship,
     };
 }

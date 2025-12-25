@@ -1,12 +1,12 @@
 
 import React from 'react';
-import type { Device, PartType } from '../types';
+import type { Device, PartType, WorkbenchPart } from '../types';
 import DeviceView from './DeviceView';
 import { ComputerIcon, WrenchIcon, MoneyIcon, TrophyIcon } from './Icons';
 
 interface GameScreenProps {
   money: number;
-  inventory: PartType[];
+  workbenchParts: WorkbenchPart[];
   currentDevice: Device | null;
   roundCompleted: boolean;
   repairCount: number;
@@ -14,28 +14,20 @@ interface GameScreenProps {
   onShowSponsorships: () => void;
   onShowRepairHistory: () => void;
   togglePartAttachment: (partId: string) => void;
-  swapPart: (partId: string) => void;
+  installNewPart: (partId: string) => void;
   onStartDelivery: () => void;
 }
 
-const InventoryItem: React.FC<{ partType: PartType; onClick: () => void }> = ({ partType, onClick }) => (
-    <button onClick={onClick} className="bg-gray-700 p-2 rounded-md hover:bg-cyan-600 transition-colors text-center">
-        <WrenchIcon className="w-8 h-8 mx-auto mb-1 text-cyan-400" />
-        <span className="text-xs">{partType}</span>
-    </button>
-);
-
-
 const GameScreen: React.FC<GameScreenProps> = ({
   money,
-  inventory,
+  workbenchParts,
   currentDevice,
   roundCompleted,
   onShowComputer,
   onShowSponsorships,
   onShowRepairHistory,
   togglePartAttachment,
-  swapPart,
+  installNewPart,
   onStartDelivery,
 }) => {
   const detachedParts = currentDevice?.parts.filter(p => !p.isAttached) || [];
@@ -72,14 +64,23 @@ const GameScreen: React.FC<GameScreenProps> = ({
         {/* Left Panel - Inventory & Detached Parts */}
         <aside className="w-64 bg-gray-800 p-4 overflow-y-auto space-y-4 flex flex-col">
           <div>
-            <h2 className="text-lg font-bold mb-2 border-b-2 border-cyan-500 pb-1">Inventário</h2>
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {inventory.length > 0 ? (
-                inventory.map((partType, index) => (
-                  <InventoryItem key={`${partType}-${index}`} partType={partType} onClick={() => {}} />
+            <h2 className="text-lg font-bold mb-2 border-b-2 border-cyan-500 pb-1">Peças Novas</h2>
+            <div className="space-y-2 mt-2">
+              {workbenchParts.length > 0 ? (
+                workbenchParts.map((part) => (
+                  <button 
+                    key={part.id} 
+                    onClick={() => installNewPart(part.id)}
+                    className="w-full p-2 rounded-md text-left bg-gray-700 hover:bg-cyan-800 transition-colors cursor-pointer border border-gray-600"
+                  >
+                      <div className="flex justify-between items-center">
+                          <p className="font-semibold text-sm">{part.type}</p>
+                          <span className="text-xs font-bold text-green-400 bg-green-900/50 px-2 py-0.5 rounded-full">NOVA</span>
+                      </div>
+                  </button>
                 ))
               ) : (
-                <p className="text-sm text-gray-400 col-span-2">Vazio. Compre peças no computador.</p>
+                <p className="text-sm text-gray-400">Compre peças novas no computador.</p>
               )}
             </div>
           </div>
@@ -96,17 +97,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
                         >
                             <p className="font-semibold text-sm">{part.type}</p>
                             {part.isBroken && <p className="text-xs text-red-300">Quebrada</p>}
-                             {part.isBroken && inventory.includes(part.type) && (
-                                <button
-                                  onClick={(e) => {
-                                      e.stopPropagation();
-                                      swapPart(part.id);
-                                  }}
-                                  className="mt-2 w-full bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-1 px-2 rounded"
-                                >
-                                  Trocar Peça
-                                </button>
-                              )}
                         </button>
                     ))
                 ) : (

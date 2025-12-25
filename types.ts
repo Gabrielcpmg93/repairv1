@@ -47,6 +47,11 @@ export interface DevicePart {
   color: string;
 }
 
+export interface WorkbenchPart {
+  id: string;
+  type: PartType;
+}
+
 export interface Device {
   id: string;
   name: string;

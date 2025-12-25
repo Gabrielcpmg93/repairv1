@@ -1,12 +1,12 @@
 
 import React, { useState, useMemo } from 'react';
-import type { StoreItem, PartType } from '../types';
+import type { StoreItem, PartType, WorkbenchPart } from '../types';
 import { PARTS_CATALOG } from '../constants';
 import { CloseIcon, CartIcon, HammerIcon, MoneyIcon, TagIcon } from './Icons';
 
 interface ComputerScreenProps {
   money: number;
-  inventory: PartType[];
+  workbenchParts: WorkbenchPart[];
   repairCount: number;
   sellingItems: { part: PartType; price: number; id: string }[];
   onBuyPart: (item: StoreItem) => void;
@@ -43,20 +43,20 @@ const PartImage: React.FC<{image: string}> = ({ image }) => {
     return <div className={`w-12 h-12 ${colorClass} rounded-md border-2 border-gray-400`}></div>;
 }
 
-const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, inventory, repairCount, sellingItems, onBuyPart, onCraftPart, onSellPart, onClose }) => {
+const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, workbenchParts, repairCount, sellingItems, onBuyPart, onCraftPart, onSellPart, onClose }) => {
   const [view, setView] = useState<'store' | 'crafting' | 'sell'>('store');
   const [sellPrices, setSellPrices] = useState<Partial<Record<PartType, number>>>({});
 
   const isCraftingUnlocked = repairCount >= CRAFTING_UNLOCK_COUNT;
 
   const inventoryCounts = useMemo(() => {
-    return inventory.reduce((acc, part) => {
-        if (part) { 
-            acc[part] = (acc[part] || 0) + 1;
+    return workbenchParts.reduce((acc, part) => {
+        if (part && part.type) { 
+            acc[part.type] = (acc[part.type] || 0) + 1;
         }
         return acc;
     }, {} as Record<PartType, number>);
-  }, [inventory]);
+  }, [workbenchParts]);
 
   // FIX: Moved useMemo to the top level to respect the Rules of Hooks.
   // This was previously inside renderSell(), causing a conditional hook call.

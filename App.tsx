@@ -69,7 +69,7 @@ export default function App() {
       {gameState === 'COMPUTER' && (
         <ComputerScreen
           money={gameLogic.money}
-          inventory={gameLogic.inventory}
+          workbenchParts={gameLogic.workbenchParts}
           repairCount={gameLogic.repairedDevices.length}
           sellingItems={gameLogic.sellingItems}
           onBuyPart={gameLogic.buyPart}
