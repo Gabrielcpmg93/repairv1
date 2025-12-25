@@ -57,6 +57,22 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, inventory, repai
     }, {} as Record<PartType, number>);
   }, [inventory]);
 
+  // FIX: Moved useMemo to the top level to respect the Rules of Hooks.
+  // This was previously inside renderSell(), causing a conditional hook call.
+  const sellableItems = useMemo(() => {
+    return (Object.keys(inventoryCounts) as PartType[])
+        .map(partType => {
+            return {
+                partType,
+                count: inventoryCounts[partType],
+                // This links inventory data with catalog data safely.
+                storeItem: PARTS_CATALOG.find(p => p.id === partType),
+            };
+        })
+        // This filter is the definitive bug fix: it ensures we only try to render items that exist in the catalog.
+        .filter(item => item.storeItem && item.count > 0);
+  }, [inventoryCounts]);
+
   const renderStore = () => (
     <table className="w-full text-black border-collapse">
       <thead>
@@ -132,21 +148,6 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, inventory, repai
   );
 
   const renderSell = () => {
-    // Robust selling item calculation to prevent crashes.
-    const sellableItems = useMemo(() => {
-        return (Object.keys(inventoryCounts) as PartType[])
-            .map(partType => {
-                return {
-                    partType,
-                    count: inventoryCounts[partType],
-                    // This links inventory data with catalog data safely.
-                    storeItem: PARTS_CATALOG.find(p => p.id === partType),
-                };
-            })
-            // This filter is the definitive bug fix: it ensures we only try to render items that exist in the catalog.
-            .filter(item => item.storeItem && item.count > 0);
-    }, [inventoryCounts]);
-
     return (
         <div className="text-black">
             {sellingItems.length > 0 && (
