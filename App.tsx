@@ -7,6 +7,7 @@ import ComputerScreen from './components/ComputerScreen';
 import SetPriceScreen from './components/SetPriceScreen';
 import DeliveryMapScreen from './components/DeliveryMapScreen';
 import SponsorshipScreen from './components/ContractsScreen';
+import RepairHistoryScreen from './components/RepairHistoryScreen';
 import type { GameState } from './types';
 
 export default function App() {
@@ -23,6 +24,8 @@ export default function App() {
   const hideComputer = useCallback(() => setGameState('PLAYING'), []);
   const showSponsorships = useCallback(() => setGameState('SPONSORSHIP'), []);
   const hideSponsorships = useCallback(() => setGameState('PLAYING'), []);
+  const showRepairHistory = useCallback(() => setGameState('REPAIR_HISTORY'), []);
+  const hideRepairHistory = useCallback(() => setGameState('PLAYING'), []);
   
   const handleStartDelivery = useCallback(() => {
     setGameState('SETTING_PRICE');
@@ -52,11 +55,13 @@ export default function App() {
     <div className="bg-gray-800 text-white w-screen h-screen overflow-hidden font-sans">
       {gameState === 'MENU' && <MainMenu onStartGame={startGame} />}
       
-      {(gameState === 'PLAYING' || gameState === 'COMPUTER' || gameState === 'SPONSORSHIP') && (
+      {(gameState === 'PLAYING' || gameState === 'COMPUTER' || gameState === 'SPONSORSHIP' || gameState === 'REPAIR_HISTORY') && (
         <GameScreen
           {...gameLogic}
+          repairCount={gameLogic.repairedDevices.length}
           onShowComputer={showComputer}
           onShowSponsorships={showSponsorships}
+          onShowRepairHistory={showRepairHistory}
           onStartDelivery={handleStartDelivery}
         />
       )}
@@ -65,7 +70,9 @@ export default function App() {
         <ComputerScreen
           money={gameLogic.money}
           inventory={gameLogic.inventory}
+          repairCount={gameLogic.repairedDevices.length}
           onBuyPart={gameLogic.buyPart}
+          onCraftPart={gameLogic.craftPart}
           onClose={hideComputer}
         />
       )}
@@ -75,6 +82,13 @@ export default function App() {
           sponsorshipActive={gameLogic.sponsorshipActive}
           onSign={handleSignSponsorship}
           onClose={hideSponsorships}
+        />
+      )}
+
+      {gameState === 'REPAIR_HISTORY' && (
+        <RepairHistoryScreen
+            devices={gameLogic.repairedDevices}
+            onClose={hideRepairHistory}
         />
       )}
       

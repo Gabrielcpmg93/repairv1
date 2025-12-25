@@ -2,15 +2,17 @@
 import React from 'react';
 import type { Device, PartType } from '../types';
 import DeviceView from './DeviceView';
-import { ComputerIcon, WrenchIcon, MoneyIcon } from './Icons';
+import { ComputerIcon, WrenchIcon, MoneyIcon, TrophyIcon } from './Icons';
 
 interface GameScreenProps {
   money: number;
   inventory: PartType[];
   currentDevice: Device | null;
   roundCompleted: boolean;
+  repairCount: number;
   onShowComputer: () => void;
   onShowSponsorships: () => void;
+  onShowRepairHistory: () => void;
   togglePartAttachment: (partId: string) => void;
   swapPart: (partId: string) => void;
   onStartDelivery: () => void;
@@ -31,6 +33,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
   roundCompleted,
   onShowComputer,
   onShowSponsorships,
+  onShowRepairHistory,
   togglePartAttachment,
   swapPart,
   onStartDelivery,
@@ -46,6 +49,9 @@ const GameScreen: React.FC<GameScreenProps> = ({
           <button onClick={onShowSponsorships} className="flex items-center bg-gray-700 px-3 py-1 rounded-full hover:bg-gray-600 transition-colors">
             <MoneyIcon className="w-6 h-6 text-yellow-400 mr-2" />
             <span className="text-lg font-semibold">R$ {money.toLocaleString('pt-BR')}</span>
+          </button>
+          <button onClick={onShowRepairHistory} className="p-3 bg-gray-700 rounded-full hover:bg-cyan-600 transition-colors">
+            <TrophyIcon className="w-6 h-6 text-yellow-300" />
           </button>
           <button onClick={onShowComputer} className="p-3 bg-gray-700 rounded-full hover:bg-cyan-600 transition-colors">
             <ComputerIcon className="w-6 h-6" />

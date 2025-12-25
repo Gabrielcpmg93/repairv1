@@ -1,15 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import type { StoreItem, PartType } from '../types';
 import { PARTS_CATALOG } from '../constants';
-import { CloseIcon, CartIcon, MoneyIcon } from './Icons';
+import { CloseIcon, CartIcon, HammerIcon, MoneyIcon } from './Icons';
 
 interface ComputerScreenProps {
   money: number;
   inventory: PartType[];
+  repairCount: number;
   onBuyPart: (item: StoreItem) => void;
+  onCraftPart: (item: StoreItem) => void;
   onClose: () => void;
 }
+
+const CRAFTING_UNLOCK_COUNT = 3;
 
 const PartImage: React.FC<{image: string}> = ({ image }) => {
     let colorClass = 'bg-gray-500';
@@ -36,12 +40,89 @@ const PartImage: React.FC<{image: string}> = ({ image }) => {
     return <div className={`w-12 h-12 ${colorClass} rounded-md border-2 border-gray-400`}></div>;
 }
 
-const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, onBuyPart, onClose }) => {
+const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, repairCount, onBuyPart, onCraftPart, onClose }) => {
+  const [view, setView] = useState<'store' | 'crafting'>('store');
+  const isCraftingUnlocked = repairCount >= CRAFTING_UNLOCK_COUNT;
+
+  const renderStore = () => (
+    <table className="w-full text-black border-collapse">
+      <thead>
+        <tr className="text-left bg-gray-200">
+          <th className="p-2 border-b-2 border-gray-300"></th>
+          <th className="p-2 border-b-2 border-gray-300">Produto</th>
+          <th className="p-2 border-b-2 border-gray-300">Preço</th>
+          <th className="p-2 border-b-2 border-gray-300">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {PARTS_CATALOG.map((item) => (
+          <tr key={item.id} className="hover:bg-blue-100">
+            <td className="p-3 border-b border-gray-200 flex justify-center items-center">
+              <PartImage image={item.image} />
+            </td>
+            <td className="p-3 border-b border-gray-200">
+              <p className="font-bold">{item.name}</p>
+              <p className="text-sm text-gray-600">{item.brand}</p>
+            </td>
+            <td className="p-3 border-b border-gray-200 font-mono font-bold">R$ {item.price.toLocaleString('pt-BR')}</td>
+            <td className="p-3 border-b border-gray-200">
+              <button
+                onClick={() => onBuyPart(item)}
+                className="bg-green-500 text-white font-bold px-4 py-1.5 rounded-sm border-2 border-b-green-700 border-r-green-700 border-t-green-400 border-l-green-400 hover:bg-green-600 active:border-t-green-700 active:border-l-green-700"
+              >
+                Na cesta
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+
+  const renderCrafting = () => (
+     <table className="w-full text-black border-collapse">
+      <thead>
+        <tr className="text-left bg-gray-200">
+          <th className="p-2 border-b-2 border-gray-300"></th>
+          <th className="p-2 border-b-2 border-gray-300">Peça</th>
+          <th className="p-2 border-b-2 border-gray-300">Custo de Criação</th>
+          <th className="p-2 border-b-2 border-gray-300">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {PARTS_CATALOG.map((item) => {
+            const craftingCost = Math.floor(item.price * 0.75);
+            return (
+              <tr key={item.id} className="hover:bg-amber-100">
+                <td className="p-3 border-b border-gray-200 flex justify-center items-center">
+                  <PartImage image={item.image} />
+                </td>
+                <td className="p-3 border-b border-gray-200">
+                  <p className="font-bold">{item.name}</p>
+                  <p className="text-sm text-gray-600">{item.brand}</p>
+                </td>
+                <td className="p-3 border-b border-gray-200 font-mono font-bold text-amber-700">R$ {craftingCost.toLocaleString('pt-BR')}</td>
+                <td className="p-3 border-b border-gray-200">
+                  <button
+                    onClick={() => onCraftPart(item)}
+                    className="bg-orange-500 text-white font-bold px-4 py-1.5 rounded-sm border-2 border-b-orange-700 border-r-orange-700 border-t-orange-400 border-l-orange-400 hover:bg-orange-600 active:border-t-orange-700 active:border-l-orange-700 flex items-center"
+                  >
+                    <HammerIcon className="w-4 h-4 mr-2" />
+                    Criar
+                  </button>
+                </td>
+              </tr>
+            );
+        })}
+      </tbody>
+    </table>
+  );
+
+
   return (
     <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
       <div className="w-[800px] h-[600px] bg-gray-300 rounded-lg shadow-2xl flex flex-col overflow-hidden border-4 border-t-gray-100 border-l-gray-100 border-r-gray-500 border-b-gray-500">
         
-        {/* Title Bar */}
         <div className="bg-blue-800 text-white flex justify-between items-center p-1 pl-3 select-none">
           <h2 className="font-bold">GOZILLA FAIRFOX</h2>
           <button onClick={onClose} className="bg-gray-300 text-black w-6 h-6 flex items-center justify-center font-bold border-2 border-t-gray-100 border-l-gray-100 border-r-gray-500 border-b-gray-500">
@@ -49,58 +130,41 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, onBuyPart, onClo
           </button>
         </div>
 
-        {/* Toolbar */}
-        <div className="bg-gray-200 p-1 border-b-2 border-gray-400 flex items-center space-x-4">
-            <span className="ml-2">Mercado digital ...</span>
-            <span className="font-bold text-blue-800">Peças - Packuten</span>
+        <div className="bg-gray-200 p-1 border-b-2 border-gray-400 flex items-center space-x-2">
+            <button onClick={() => setView('store')} className={`font-bold px-3 py-1 border-2 ${view === 'store' ? 'bg-gray-100 border-b-gray-100' : 'bg-gray-300 hover:bg-gray-100'}`}>
+                <CartIcon className="w-5 h-5 inline-block mr-2"/>
+                Peças - Packuten
+            </button>
+            <button 
+              onClick={() => isCraftingUnlocked && setView('crafting')} 
+              disabled={!isCraftingUnlocked}
+              className={`font-bold px-3 py-1 border-2 disabled:cursor-not-allowed disabled:text-gray-500 relative group ${view === 'crafting' ? 'bg-gray-100 border-b-gray-100' : 'bg-gray-300 hover:bg-gray-100'}`}
+            >
+                <HammerIcon className="w-5 h-5 inline-block mr-2"/>
+                Bancada de Criação
+                {!isCraftingUnlocked && (
+                  <span className="absolute -top-8 left-0 w-max bg-black text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Conserte {CRAFTING_UNLOCK_COUNT} aparelhos para desbloquear.
+                  </span>
+                )}
+            </button>
             <div className="flex-grow"></div>
             <div className="flex items-center bg-black text-white px-2 py-0.5 rounded-sm">
-                 <CartIcon className="w-5 h-5 mr-2"/>
+                 <MoneyIcon className="w-5 h-5 mr-2"/>
                  <span>R$ {money.toLocaleString('pt-BR')}</span>
             </div>
         </div>
 
         <div className="bg-gray-200 p-2 border-b-2 border-gray-400">
-            <p className="text-black bg-white p-1 border-2 border-gray-500 border-r-gray-100 border-b-gray-100">www.packuten.co.jp</p>
+            <p className="text-black bg-white p-1 border-2 border-gray-500 border-r-gray-100 border-b-gray-100">
+                {view === 'store' ? 'www.packuten.co.jp' : 'local://workbench/crafting'}
+            </p>
         </div>
 
-        {/* Main Content */}
         <div className="flex-1 bg-white p-4 overflow-y-auto">
-          <table className="w-full text-black border-collapse">
-            <thead>
-              <tr className="text-left bg-gray-200">
-                <th className="p-2 border-b-2 border-gray-300"></th>
-                <th className="p-2 border-b-2 border-gray-300">Produto</th>
-                <th className="p-2 border-b-2 border-gray-300">Preço</th>
-                <th className="p-2 border-b-2 border-gray-300">Ação</th>
-              </tr>
-            </thead>
-            <tbody>
-              {PARTS_CATALOG.map((item) => (
-                <tr key={item.id} className="hover:bg-blue-100">
-                  <td className="p-3 border-b border-gray-200 flex justify-center items-center">
-                    <PartImage image={item.image} />
-                  </td>
-                  <td className="p-3 border-b border-gray-200">
-                    <p className="font-bold">{item.name}</p>
-                    <p className="text-sm text-gray-600">{item.brand}</p>
-                  </td>
-                  <td className="p-3 border-b border-gray-200 font-mono font-bold">R$ {item.price.toLocaleString('pt-BR')}</td>
-                  <td className="p-3 border-b border-gray-200">
-                    <button
-                      onClick={() => onBuyPart(item)}
-                      className="bg-green-500 text-white font-bold px-4 py-1.5 rounded-sm border-2 border-b-green-700 border-r-green-700 border-t-green-400 border-l-green-400 hover:bg-green-600 active:border-t-green-700 active:border-l-green-700"
-                    >
-                      Na cesta
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            {view === 'store' ? renderStore() : renderCrafting()}
         </div>
 
-        {/* Status Bar */}
         <div className="bg-gray-300 border-t-2 border-gray-200 px-2 py-1 flex justify-end">
             <div className="border-2 border-gray-400 border-t-gray-500 border-l-gray-500 px-4">
                 <span className="text-black">R$ {money.toLocaleString('pt-BR')}</span>

@@ -1,5 +1,5 @@
 
-export type GameState = 'MENU' | 'PLAYING' | 'COMPUTER' | 'SETTING_PRICE' | 'DELIVERING' | 'SPONSORSHIP';
+export type GameState = 'MENU' | 'PLAYING' | 'COMPUTER' | 'SETTING_PRICE' | 'DELIVERING' | 'SPONSORSHIP' | 'REPAIR_HISTORY';
 export type DeviceType = 'PHONE' | 'CONSOLE' | 'CONTROLLER';
 
 export enum PartType {

@@ -49,6 +49,7 @@ export default function useGameLogic() {
     const [money, setMoney] = useState(INITIAL_MONEY);
     const [inventory, setInventory] = useState<PartType[]>([]);
     const [currentDevice, setCurrentDevice] = useState<Device | null>(null);
+    const [repairedDevices, setRepairedDevices] = useState<Device[]>([]);
     const [roundCompleted, setRoundCompleted] = useState(false);
     const [sponsorshipActive, setSponsorshipActive] = useState(false);
 
@@ -69,8 +70,11 @@ export default function useGameLogic() {
 
     const collectPaymentAndStartNewRound = useCallback((price: number) => {
         setMoney(prev => prev + price);
+        if (currentDevice) {
+            setRepairedDevices(prev => [...prev, currentDevice]);
+        }
         startNewRound();
-    }, [startNewRound]);
+    }, [startNewRound, currentDevice]);
     
     const buyPart = useCallback((item: StoreItem) => {
         if (money >= item.price) {
@@ -79,6 +83,17 @@ export default function useGameLogic() {
             return true;
         }
         alert("Dinheiro insuficiente!");
+        return false;
+    }, [money]);
+
+    const craftPart = useCallback((item: StoreItem) => {
+        const craftingCost = Math.floor(item.price * 0.75);
+        if (money >= craftingCost) {
+            setMoney(prev => prev - craftingCost);
+            setInventory(prev => [...prev, item.id]);
+            return true;
+        }
+        alert("Dinheiro insuficiente para criar esta peça!");
         return false;
     }, [money]);
 
@@ -143,11 +158,13 @@ export default function useGameLogic() {
         money,
         inventory,
         currentDevice,
+        repairedDevices,
         roundCompleted,
         sponsorshipActive,
         startNewRound,
         collectPaymentAndStartNewRound,
         buyPart,
+        craftPart,
         togglePartAttachment,
         swapPart,
         signSponsorship,
