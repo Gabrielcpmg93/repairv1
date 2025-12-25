@@ -69,162 +69,204 @@ const generateTelevision = (): Device => {
     return { id: `television-${Date.now()}`, name: 'TV de LED Panaview', type: 'TELEVISION', parts };
 };
 
-
 const deviceGenerators = [generatePhone, generateConsole, generateController, generateRadio, generateTelevision];
 
+const checkWinCondition = (device: Device | null): boolean => {
+    if (!device) return false;
+    const allAttached = device.parts.every(p => p.isAttached);
+    const allFixed = device.parts.every(p => !p.isBroken);
+    return allAttached && allFixed;
+};
+
+
+interface GameLogicState {
+    money: number;
+    inventory: PartType[];
+    currentDevice: Device | null;
+    repairedDevices: Device[];
+    roundCompleted: boolean;
+    sponsorshipActive: boolean;
+    sellingItems: { part: PartType; price: number; id: string }[];
+}
+
+const initialState: GameLogicState = {
+    money: INITIAL_MONEY,
+    inventory: [],
+    currentDevice: null,
+    repairedDevices: [],
+    roundCompleted: false,
+    sponsorshipActive: false,
+    sellingItems: [],
+};
+
 export default function useGameLogic() {
-    const [money, setMoney] = useState(INITIAL_MONEY);
-    const [inventory, setInventory] = useState<PartType[]>([]);
-    const [currentDevice, setCurrentDevice] = useState<Device | null>(null);
-    const [repairedDevices, setRepairedDevices] = useState<Device[]>([]);
-    const [roundCompleted, setRoundCompleted] = useState(false);
-    const [sponsorshipActive, setSponsorshipActive] = useState(false);
-    const [sellingItems, setSellingItems] = useState<{ part: PartType; price: number; id: string }[]>([]);
+    const [state, setState] = useState<GameLogicState>(initialState);
 
     useEffect(() => {
-        if (sponsorshipActive) {
+        if (state.sponsorshipActive) {
             const intervalId = setInterval(() => {
-                setMoney(prev => prev + 500);
+                setState(prevState => ({ ...prevState, money: prevState.money + 500 }));
             }, 1000);
             return () => clearInterval(intervalId);
         }
-    }, [sponsorshipActive]);
+    }, [state.sponsorshipActive]);
 
     const startNewRound = useCallback(() => {
         const randomGenerator = deviceGenerators[Math.floor(Math.random() * deviceGenerators.length)];
-        setCurrentDevice(randomGenerator());
-        setRoundCompleted(false);
+        setState(prevState => ({
+            ...prevState,
+            currentDevice: randomGenerator(),
+            roundCompleted: false,
+        }));
     }, []);
 
     const collectPaymentAndStartNewRound = useCallback((price: number) => {
-        setMoney(prev => prev + price);
-        if (currentDevice) {
-            setRepairedDevices(prev => [...prev, currentDevice]);
-        }
-        startNewRound();
-    }, [startNewRound, currentDevice]);
+        const randomGenerator = deviceGenerators[Math.floor(Math.random() * deviceGenerators.length)];
+        setState(prevState => {
+            if (!prevState.currentDevice) return prevState;
+            return {
+                ...prevState,
+                money: prevState.money + price,
+                repairedDevices: [...prevState.repairedDevices, prevState.currentDevice],
+                currentDevice: randomGenerator(),
+                roundCompleted: false,
+            };
+        });
+    }, []);
     
     const buyPart = useCallback((item: StoreItem) => {
-        if (money >= item.price) {
-            setMoney(prev => prev - item.price);
-            setInventory(prev => [...prev, item.id]);
-            return true;
+        let success = false;
+        setState(prevState => {
+            if (prevState.money >= item.price) {
+                success = true;
+                return {
+                    ...prevState,
+                    money: prevState.money - item.price,
+                    inventory: [...prevState.inventory, item.id],
+                };
+            }
+            return prevState;
+        });
+        if (!success) {
+            alert("Dinheiro insuficiente!");
         }
-        alert("Dinheiro insuficiente!");
-        return false;
-    }, [money]);
+        return success;
+    }, []);
 
     const craftPart = useCallback((item: StoreItem) => {
         const craftingCost = Math.floor(item.price * 0.75);
-        if (money >= craftingCost) {
-            setMoney(prev => prev - craftingCost);
-            setInventory(prev => [...prev, item.id]);
-            return true;
+        let success = false;
+        setState(prevState => {
+            if (prevState.money >= craftingCost) {
+                success = true;
+                return {
+                    ...prevState,
+                    money: prevState.money - craftingCost,
+                    inventory: [...prevState.inventory, item.id],
+                };
+            }
+            return prevState;
+        });
+        if (!success) {
+            alert("Dinheiro insuficiente para criar esta peça!");
         }
-        alert("Dinheiro insuficiente para criar esta peça!");
-        return false;
-    }, [money]);
+        return success;
+    }, []);
 
     const sellPart = useCallback((partType: PartType, price: number) => {
-        // Proactive validation to enhance robustness.
         if (!partType || price <= 0) {
             console.error("Tentativa de venda inválida.", { partType, price });
             return false;
         }
 
-        const inventoryIndex = inventory.lastIndexOf(partType);
-        if (inventoryIndex === -1) {
-            alert("Peça não encontrada no inventário!");
-            return false;
-        }
-
-        const newInventory = [...inventory];
-        newInventory.splice(inventoryIndex, 1);
-        setInventory(newInventory);
-
+        let success = false;
         const saleId = `${partType}-${Date.now()}`;
-        const newSellingItem = { part: partType, price, id: saleId };
-        setSellingItems(prev => [...prev, newSellingItem]);
+        
+        setState(prevState => {
+            const inventoryIndex = prevState.inventory.lastIndexOf(partType);
+            if (inventoryIndex === -1) {
+                return prevState;
+            }
+            success = true;
+            const newInventory = [...prevState.inventory];
+            newInventory.splice(inventoryIndex, 1);
+            const newSellingItem = { part: partType, price, id: saleId };
+            return {
+                ...prevState,
+                inventory: newInventory,
+                sellingItems: [...prevState.sellingItems, newSellingItem],
+            };
+        });
 
-        setTimeout(() => {
-            setMoney(prev => prev + price);
-            setSellingItems(prev => prev.filter(item => item.id !== saleId));
-        }, 2000);
-
-        return true;
-    }, [inventory]);
-
-    const checkWinCondition = useCallback((device: Device) => {
-        if (roundCompleted) return;
-        const allAttached = device.parts.every(p => p.isAttached);
-        const allFixed = device.parts.every(p => !p.isBroken);
-
-        if (allAttached && allFixed) {
-            setRoundCompleted(true);
+        if (success) {
+            setTimeout(() => {
+                setState(prevState => ({
+                    ...prevState,
+                    money: prevState.money + price,
+                    sellingItems: prevState.sellingItems.filter(item => item.id !== saleId),
+                }));
+            }, 2000);
+        } else {
+             alert("Peça não encontrada no inventário!");
         }
-    }, [roundCompleted]);
+        return success;
+    }, []);
 
     const togglePartAttachment = useCallback((partId: string) => {
-        setCurrentDevice(prevDevice => {
-            if (!prevDevice) return null;
-            const newParts = prevDevice.parts.map(p => 
+        setState(prevState => {
+            if (!prevState.currentDevice) return prevState;
+            const newParts = prevState.currentDevice.parts.map(p => 
                 p.id === partId ? { ...p, isAttached: !p.isAttached } : p
             );
-            const newDevice = { ...prevDevice, parts: newParts };
-            checkWinCondition(newDevice);
-            return newDevice;
+            const newDevice = { ...prevState.currentDevice, parts: newParts };
+            return {
+                ...prevState,
+                currentDevice: newDevice,
+                roundCompleted: prevState.roundCompleted || checkWinCondition(newDevice),
+            };
         });
-    }, [checkWinCondition]);
+    }, []);
 
     const swapPart = useCallback((partId: string) => {
-        if (!currentDevice) {
-            return;
-        }
+        setState(prevState => {
+            const { currentDevice, inventory } = prevState;
+            if (!currentDevice) return prevState;
 
-        const partToSwap = currentDevice.parts.find(p => p.id === partId);
-        if (!partToSwap || !partToSwap.isBroken) {
-            return;
-        }
+            const partToSwap = currentDevice.parts.find(p => p.id === partId);
+            if (!partToSwap || !partToSwap.isBroken) return prevState;
 
-        const inventoryIndex = inventory.indexOf(partToSwap.type);
-        if (inventoryIndex === -1) {
-            alert(`Você precisa de uma peça '${partToSwap.type}' nova no inventário!`);
-            return;
-        }
+            const inventoryIndex = inventory.indexOf(partToSwap.type);
+            if (inventoryIndex === -1) {
+                alert(`Você precisa de uma peça '${partToSwap.type}' nova no inventário!`);
+                return prevState;
+            }
 
-        // Create new states based on the current state
-        const newInventory = [...inventory];
-        newInventory.splice(inventoryIndex, 1);
-        
-        const newParts = currentDevice.parts.map(p =>
-            p.id === partId ? { ...p, isBroken: false } : p
-        );
-        const newDevice = { ...currentDevice, parts: newParts };
-        
-        // Batch state updates
-        setInventory(newInventory);
-        setCurrentDevice(newDevice);
-        
-        // Check win condition with the new device state
-        checkWinCondition(newDevice);
+            const newInventory = [...inventory];
+            newInventory.splice(inventoryIndex, 1);
 
-    }, [currentDevice, inventory, checkWinCondition]);
-
+            const newParts = currentDevice.parts.map(p =>
+                p.id === partId ? { ...p, isBroken: false } : p
+            );
+            const newDevice = { ...currentDevice, parts: newParts };
+            
+            return {
+                ...prevState,
+                inventory: newInventory,
+                currentDevice: newDevice,
+                roundCompleted: prevState.roundCompleted || checkWinCondition(newDevice),
+            };
+        });
+    }, []);
 
     const signSponsorship = useCallback(() => {
-        if (!sponsorshipActive) {
-            setSponsorshipActive(true);
-        }
-    }, [sponsorshipActive]);
+        setState(prevState => {
+            if (prevState.sponsorshipActive) return prevState;
+            return { ...prevState, sponsorshipActive: true };
+        });
+    }, []);
 
     return {
-        money,
-        inventory,
-        currentDevice,
-        repairedDevices,
-        roundCompleted,
-        sponsorshipActive,
-        sellingItems,
+        ...state,
         startNewRound,
         collectPaymentAndStartNewRound,
         buyPart,
