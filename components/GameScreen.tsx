@@ -10,7 +10,7 @@ interface GameScreenProps {
   currentDevice: Device | null;
   roundCompleted: boolean;
   onShowComputer: () => void;
-  onShowContracts: () => void;
+  onShowSponsorships: () => void;
   togglePartAttachment: (partId: string) => void;
   swapPart: (partId: string) => void;
   onStartDelivery: () => void;
@@ -30,7 +30,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
   currentDevice,
   roundCompleted,
   onShowComputer,
-  onShowContracts,
+  onShowSponsorships,
   togglePartAttachment,
   swapPart,
   onStartDelivery,
@@ -43,7 +43,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
       <header className="flex justify-between items-center p-4 bg-gray-900 shadow-lg z-10">
         <h1 className="text-2xl font-bold text-cyan-400">Bancada de Reparos</h1>
         <div className="flex items-center space-x-4">
-          <button onClick={onShowContracts} className="flex items-center bg-gray-700 px-3 py-1 rounded-full hover:bg-gray-600 transition-colors">
+          <button onClick={onShowSponsorships} className="flex items-center bg-gray-700 px-3 py-1 rounded-full hover:bg-gray-600 transition-colors">
             <MoneyIcon className="w-6 h-6 text-yellow-400 mr-2" />
             <span className="text-lg font-semibold">R$ {money.toLocaleString('pt-BR')}</span>
           </button>
@@ -53,7 +53,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
           {roundCompleted && (
             <button 
                 onClick={onStartDelivery} 
-                className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg shadow-green-500/50 animate-pulse"
+                className="bg-green-500 hover:bg-green-400 text-white font-bold py-1 px-3 text-sm rounded-lg transition-transform transform hover:scale-105 shadow-lg shadow-green-500/50 animate-pulse"
             >
                 Entregar
             </button>

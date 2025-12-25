@@ -1,9 +1,15 @@
 
-import type { StoreItem, Contract } from './types';
+import type { StoreItem } from './types';
 import { PartType } from './types';
 
 export const INITIAL_MONEY = 2500;
-export const REPAIRS_PER_CONTRACT = 5;
+
+export const SPONSORSHIP_DEAL = {
+    brand: 'Quantum Core',
+    paymentPerSecond: 500,
+    description: 'Faça uma parceria com a Quantum Core, líder em computação de ponta, e receba um fluxo de renda constante para financiar sua oficina.',
+    logoColor: 'bg-indigo-500',
+};
 
 export const PARTS_CATALOG: StoreItem[] = [
   // Phone Parts
@@ -27,14 +33,3 @@ export const PARTS_CATALOG: StoreItem[] = [
   { id: PartType.JOYSTICK, name: "Módulo Analógico Joystick", price: 150, brand: "G-Pad", image: "dark-gray" },
   { id: PartType.BUTTONS_PAD, name: "Botões de Ação e D-Pad", price: 120, brand: "G-Pad", image: "multi-color" },
 ];
-
-export const CONTRACTS_DATA: Contract[] = [
-    {
-        id: 'tucano-01',
-        brand: 'TucanoCell',
-        payment: 300,
-        durationInRepairs: REPAIRS_PER_CONTRACT,
-        description: 'Seja um parceiro oficial da TucanoCell, a marca de celulares que voa alto! Receba um bônus por cada período de contrato para garantir o melhor serviço para nossos clientes.',
-        logoColor: 'bg-yellow-500',
-    }
-]

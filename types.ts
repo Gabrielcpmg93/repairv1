@@ -1,5 +1,5 @@
 
-export type GameState = 'MENU' | 'PLAYING' | 'COMPUTER' | 'SETTING_PRICE' | 'DELIVERING' | 'CONTRACTS';
+export type GameState = 'MENU' | 'PLAYING' | 'COMPUTER' | 'SETTING_PRICE' | 'DELIVERING' | 'SPONSORSHIP';
 export type DeviceType = 'PHONE' | 'CONSOLE' | 'CONTROLLER';
 
 export enum PartType {
@@ -46,13 +46,4 @@ export interface StoreItem {
     price: number;
     brand: string;
     image: string; // A simple representation, could be a color or icon name
-}
-
-export interface Contract {
-    id: string;
-    brand: string;
-    payment: number;
-    durationInRepairs: number;
-    description: string;
-    logoColor: string;
 }

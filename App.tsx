@@ -6,7 +6,7 @@ import useGameLogic from './hooks/useGameLogic';
 import ComputerScreen from './components/ComputerScreen';
 import SetPriceScreen from './components/SetPriceScreen';
 import DeliveryMapScreen from './components/DeliveryMapScreen';
-import ContractsScreen from './components/ContractsScreen';
+import SponsorshipScreen from './components/ContractsScreen';
 import type { GameState } from './types';
 
 export default function App() {
@@ -21,8 +21,8 @@ export default function App() {
 
   const showComputer = useCallback(() => setGameState('COMPUTER'), []);
   const hideComputer = useCallback(() => setGameState('PLAYING'), []);
-  const showContracts = useCallback(() => setGameState('CONTRACTS'), []);
-  const hideContracts = useCallback(() => setGameState('PLAYING'), []);
+  const showSponsorships = useCallback(() => setGameState('SPONSORSHIP'), []);
+  const hideSponsorships = useCallback(() => setGameState('PLAYING'), []);
   
   const handleStartDelivery = useCallback(() => {
     setGameState('SETTING_PRICE');
@@ -42,16 +42,21 @@ export default function App() {
       setGameState('PLAYING');
   }, [gameLogic, deliveryPrice]);
 
+  const handleSignSponsorship = useCallback(() => {
+    gameLogic.signSponsorship();
+    hideSponsorships();
+  }, [gameLogic, hideSponsorships]);
+
 
   return (
     <div className="bg-gray-800 text-white w-screen h-screen overflow-hidden font-sans">
       {gameState === 'MENU' && <MainMenu onStartGame={startGame} />}
       
-      {(gameState === 'PLAYING' || gameState === 'COMPUTER' || gameState === 'CONTRACTS') && (
+      {(gameState === 'PLAYING' || gameState === 'COMPUTER' || gameState === 'SPONSORSHIP') && (
         <GameScreen
           {...gameLogic}
           onShowComputer={showComputer}
-          onShowContracts={showContracts}
+          onShowSponsorships={showSponsorships}
           onStartDelivery={handleStartDelivery}
         />
       )}
@@ -65,11 +70,11 @@ export default function App() {
         />
       )}
        
-      {gameState === 'CONTRACTS' && (
-        <ContractsScreen
-          activeContract={gameLogic.activeContract}
-          onSignContract={gameLogic.signContract}
-          onClose={hideContracts}
+      {gameState === 'SPONSORSHIP' && (
+        <SponsorshipScreen
+          sponsorshipActive={gameLogic.sponsorshipActive}
+          onSign={handleSignSponsorship}
+          onClose={hideSponsorships}
         />
       )}
       
