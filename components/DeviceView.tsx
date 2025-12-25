@@ -1,3 +1,4 @@
+
 import React, { Suspense, useMemo } from 'react';
 import { Canvas, extend } from '@react-three/fiber';
 import { OrbitControls, Text, RoundedBox, shaderMaterial } from '@react-three/drei';
@@ -55,12 +56,14 @@ const DevicePart3D: React.FC<DevicePart3DProps> = ({ part, onClick, children }) 
 const getPartPositions = (deviceType: 'PHONE' | 'CONSOLE' | 'CONTROLLER'): Record<string, { pos: [number, number, number]; size: [number, number, number] }> => {
     switch (deviceType) {
         case 'PHONE':
+            // FIX: Adjusted Z-positions to prevent visual clipping/Z-fighting.
+            // Parts are layered correctly from front to back.
             return {
-                [PartType.SCREEN]: { pos: [0, 0, 0.06], size: [0.95, 2, 0.02] },
-                [PartType.MOTHERBOARD]: { pos: [0, 0, 0], size: [0.9, 1.8, 0.05] },
-                [PartType.BATTERY]: { pos: [0, 0.2, -0.05], size: [0.7, 1.2, 0.1] },
-                [PartType.CAMERA]: { pos: [0.25, 0.75, -0.02], size: [0.2, 0.2, 0.05] },
-                [PartType.BACK_COVER]: { pos: [0, 0, -0.1], size: [1, 2.05, 0.1] },
+                [PartType.SCREEN]: { pos: [0, 0, 0.035], size: [0.95, 2, 0.02] }, // Front-most
+                [PartType.MOTHERBOARD]: { pos: [0, 0, 0], size: [0.9, 1.8, 0.05] }, // Center
+                [PartType.BATTERY]: { pos: [0, 0.2, -0.075], size: [0.7, 1.2, 0.1] }, // Behind motherboard
+                [PartType.CAMERA]: { pos: [0.25, 0.75, -0.05], size: [0.2, 0.2, 0.05] }, // Behind motherboard
+                [PartType.BACK_COVER]: { pos: [0, 0, -0.175], size: [1, 2.05, 0.1] }, // Back-most
             };
         case 'CONSOLE':
             return {
