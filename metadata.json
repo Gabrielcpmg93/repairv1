@@ -1,0 +1,5 @@
+{
+  "name": "Mobile Repair Master",
+  "description": "A 3D mobile phone repair simulation game. Diagnose issues, disassemble phones piece by piece, order new parts from an in-game computer, and reassemble them to bring them back to life.",
+  "requestFramePermissions": []
+}
