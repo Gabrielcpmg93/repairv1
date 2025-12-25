@@ -139,10 +139,11 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, inventory, repai
                 return {
                     partType,
                     count: inventoryCounts[partType],
+                    // This links inventory data with catalog data safely.
                     storeItem: PARTS_CATALOG.find(p => p.id === partType),
                 };
             })
-            // This filter is the core bug fix: it ensures we only try to render items that exist.
+            // This filter is the definitive bug fix: it ensures we only try to render items that exist in the catalog.
             .filter(item => item.storeItem && item.count > 0);
     }, [inventoryCounts]);
 
@@ -171,7 +172,7 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, inventory, repai
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sellableItems.map(({ partType, count, storeItem }) => {
-                    // This check is now redundant due to the filter, but adds extra safety.
+                    // Thanks to the filter above, 'storeItem' is guaranteed to exist here.
                     if (!storeItem) return null; 
 
                     const price = sellPrices[partType] || Math.floor(storeItem.price * 0.5);

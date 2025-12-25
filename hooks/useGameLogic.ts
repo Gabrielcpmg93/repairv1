@@ -99,6 +99,12 @@ export default function useGameLogic() {
     }, [money]);
 
     const sellPart = useCallback((partType: PartType, price: number) => {
+        // Proactive validation to enhance robustness.
+        if (!partType || price <= 0) {
+            console.error("Tentativa de venda inválida.", { partType, price });
+            return false;
+        }
+
         const inventoryIndex = inventory.lastIndexOf(partType);
         if (inventoryIndex === -1) {
             alert("Peça não encontrada no inventário!");
