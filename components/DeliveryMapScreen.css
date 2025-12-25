@@ -1,81 +1,30 @@
-.map-container {
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-}
 
-.map-bg {
-  position: absolute;
-  inset: 0;
+.grid-bg {
   background-image:
-    linear-gradient(rgba(0, 100, 100, 0.2) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 100, 100, 0.2) 1px, transparent 1px);
+    linear-gradient(rgba(0, 150, 150, 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 150, 150, 0.2) 1px, transparent 1px);
   background-size: 20px 20px;
-  opacity: 0.5;
 }
 
-.point {
-  position: absolute;
-  color: white;
-  background-color: #0891b2;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 14px;
+.path-animation {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw-path 4s ease-in-out forwards;
 }
 
-.point.start { top: 20px; left: 20px; }
-.point.end { bottom: 20px; right: 20px; }
-
-.ping {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-  border-radius: 8px;
-  background-color: #06b6d4;
-  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-@keyframes ping {
-  75%, 100% {
-    transform: translate(-50%, -50%) scale(2.5);
-    opacity: 0;
+@keyframes draw-path {
+  to {
+    stroke-dashoffset: 0;
   }
 }
 
-.road {
-  position: absolute;
-  top: 32px;
-  left: 65px;
-  width: 390px;
-  height: 230px;
-  border: 4px dashed rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
-}
-
-.van {
-  position: absolute;
-  /* Scaled down path for a 500x300 container */
-  offset-path: path('M35 35 Q 250 280, 465 260');
-  animation: drive 5s linear forwards;
-}
-
-@keyframes drive {
-  0% { 
-    offset-distance: 0%;
-    transform: rotate(25deg);
-  }
-  30% { transform: rotate(0deg); }
-  70% { transform: rotate(0deg); }
-  100% { 
-    offset-distance: 100%;
-    transform: rotate(-10deg);
-  }
+.glow-effect {
+    box-shadow: 0 0 15px 3px rgba(0, 255, 255, 0.4);
 }
 
 .fade-in {
-  animation: fadeIn 0.5s ease-in-out forwards;
+  animation: fadeIn 0.5s 0.2s ease-in-out forwards;
+  opacity: 0;
 }
 
 @keyframes fadeIn {
