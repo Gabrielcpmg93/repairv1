@@ -156,7 +156,10 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, inventory, repai
                 </thead>
                 <tbody>
                     {sellableParts.map(partType => {
-                        const storeItem = PARTS_CATALOG.find(p => p.id === partType)!;
+                        const storeItem = PARTS_CATALOG.find(p => p.id === partType);
+                        if (!storeItem) {
+                          return null; // Evita que o aplicativo quebre se a peça não for encontrada
+                        }
                         const price = sellPrices[partType] || Math.floor(storeItem.price * 0.5);
 
                         return (
