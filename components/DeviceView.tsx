@@ -1,7 +1,6 @@
 import React, { Suspense, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
-// FIX: Import `PartType` as a value to access its enum members, while keeping Device and DevicePart as type-only imports.
 import { PartType, type Device, type DevicePart } from '../types';
 
 interface DevicePart3DProps {
@@ -23,7 +22,7 @@ const DevicePart3D: React.FC<DevicePart3DProps> = ({ part, onClick, children }) 
   );
 };
 
-// FIX: Add an explicit return type to ensure TypeScript can correctly infer the object shape for destructuring `pos` and `size` properties later.
+// FIX: Added an explicit return type and an exhaustive check to the switch statement. This improves type safety by ensuring the function always returns a well-defined object, which resolves destructuring errors for 'pos' and 'size' on line 92.
 const getPartPositions = (deviceType: 'PHONE' | 'CONSOLE' | 'CONTROLLER'): Record<string, { pos: [number, number, number]; size: [number, number, number] }> => {
     switch (deviceType) {
         case 'PHONE':
@@ -50,7 +49,6 @@ const getPartPositions = (deviceType: 'PHONE' | 'CONSOLE' | 'CONTROLLER'): Recor
                 [PartType.BUTTONS_PAD]: { pos: [0.4, 0.2, 0], size: [0.4, 0.1, 0.4] },
                 [PartType.CONTROLLER_SHELL]: { pos: [0, 0.15, 0], size: [1.8, 0.4, 0.8] },
             };
-        // FIX: Added an exhaustive check for the switch statement. This improves type safety and allows TypeScript to correctly infer the return type, resolving destructuring errors for 'pos' and 'size'.
         default:
             const _exhaustiveCheck: never = deviceType;
             throw new Error(`Unhandled device type: ${_exhaustiveCheck}`);
