@@ -177,33 +177,39 @@ export default function useGameLogic() {
     }, [checkWinCondition]);
 
     const swapPart = useCallback((partId: string) => {
-       setCurrentDevice(prevDevice => {
-            if (!prevDevice) return null;
-            const partToSwap = prevDevice.parts.find(p => p.id === partId);
-            if (!partToSwap || !partToSwap.isBroken) return prevDevice;
+        if (!currentDevice) {
+            return;
+        }
 
-            const inventoryHasReplacement = inventory.includes(partToSwap.type);
-            if (!inventoryHasReplacement) {
-                alert(`Você precisa de uma peça '${partToSwap.type}' nova no inventário!`);
-                return prevDevice;
-            }
+        const partToSwap = currentDevice.parts.find(p => p.id === partId);
+        if (!partToSwap || !partToSwap.isBroken) {
+            return;
+        }
 
-            const inventoryIndex = inventory.indexOf(partToSwap.type);
-            setInventory(prev => {
-                const newInventory = [...prev];
-                newInventory.splice(inventoryIndex, 1);
-                return newInventory;
-            });
-            
-            const newParts = prevDevice.parts.map(p =>
-                p.id === partId ? { ...p, isBroken: false } : p
-            );
+        const inventoryIndex = inventory.indexOf(partToSwap.type);
+        if (inventoryIndex === -1) {
+            alert(`Você precisa de uma peça '${partToSwap.type}' nova no inventário!`);
+            return;
+        }
 
-            const newDevice = { ...prevDevice, parts: newParts };
-            checkWinCondition(newDevice);
-            return newDevice;
-       });
-    }, [inventory, checkWinCondition]);
+        // Create new states based on the current state
+        const newInventory = [...inventory];
+        newInventory.splice(inventoryIndex, 1);
+        
+        const newParts = currentDevice.parts.map(p =>
+            p.id === partId ? { ...p, isBroken: false } : p
+        );
+        const newDevice = { ...currentDevice, parts: newParts };
+        
+        // Batch state updates
+        setInventory(newInventory);
+        setCurrentDevice(newDevice);
+        
+        // Check win condition with the new device state
+        checkWinCondition(newDevice);
+
+    }, [currentDevice, inventory, checkWinCondition]);
+
 
     const signSponsorship = useCallback(() => {
         if (!sponsorshipActive) {
