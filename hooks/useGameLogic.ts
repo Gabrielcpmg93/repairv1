@@ -19,7 +19,7 @@ const generatePhone = (): Device => {
 
 const generateConsole = (): Device => {
     const parts: DevicePart[] = [
-        { id: 'c1', type: PartTypeEnum.TOP_CASING, isBroken: false, isAttached: true, color: '#e2e8f0' },
+        { id: 'c1', type: PartTypeEnum.TOP_CASING, isBroken: false, isAttached: true, color: '#d1d5db' },
         { id: 'c2', type: PartTypeEnum.DISK_DRIVE, isBroken: false, isAttached: true, color: '#4a5568' },
         { id: 'c3', type: PartTypeEnum.FAN, isBroken: false, isAttached: true, color: '#2d3748' },
         { id: 'c4', type: PartTypeEnum.PSU, isBroken: false, isAttached: true, color: '#a0aec0' },
@@ -27,12 +27,12 @@ const generateConsole = (): Device => {
     ];
     const partToBreakIndex = Math.floor(Math.random() * parts.length);
     parts[partToBreakIndex].isBroken = true;
-    return { id: `console-${Date.now()}`, name: 'G-Station', type: 'CONSOLE', parts };
+    return { id: `console-${Date.now()}`, name: 'Super Retro Console', type: 'CONSOLE', parts };
 };
 
 const generateController = (): Device => {
     const parts: DevicePart[] = [
-        { id: 't1', type: PartTypeEnum.CONTROLLER_SHELL, isBroken: false, isAttached: true, color: '#2d3748' },
+        { id: 't1', type: PartTypeEnum.CONTROLLER_SHELL, isBroken: false, isAttached: true, color: '#d1d5db' },
         { id: 't2', type: PartTypeEnum.CONTROLLER_BATTERY, isBroken: false, isAttached: true, color: '#718096' },
         { id: 't3', type: PartTypeEnum.CONTROLLER_MOTHERBOARD, isBroken: false, isAttached: true, color: '#48bb78' },
         { id: 't4', type: PartTypeEnum.JOYSTICK, isBroken: false, isAttached: true, color: '#4a5568' },
@@ -40,7 +40,7 @@ const generateController = (): Device => {
     ];
     const partToBreakIndex = Math.floor(Math.random() * parts.length);
     parts[partToBreakIndex].isBroken = true;
-    return { id: `controller-${Date.now()}`, name: 'G-Pad', type: 'CONTROLLER', parts };
+    return { id: `controller-${Date.now()}`, name: 'Super Retro Pad', type: 'CONTROLLER', parts };
 };
 
 const deviceGenerators = [generatePhone, generateConsole, generateController];

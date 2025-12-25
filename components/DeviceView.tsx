@@ -67,19 +67,19 @@ const getPartPositions = (deviceType: 'PHONE' | 'CONSOLE' | 'CONTROLLER'): Recor
             };
         case 'CONSOLE':
             return {
-                [PartType.CONSOLE_MOTHERBOARD]: { pos: [0, -0.2, 0], size: [2.5, 0.1, 2.5] },
+                [PartType.TOP_CASING]: { pos: [0, 0.5, 0], size: [2.8, 0.6, 2.4] },
+                [PartType.CONSOLE_MOTHERBOARD]: { pos: [0, -0.2, 0], size: [2.5, 0.1, 2.2] },
                 [PartType.PSU]: { pos: [-0.8, 0.1, 0], size: [0.8, 0.5, 2] },
                 [PartType.FAN]: { pos: [0.8, 0.1, 0.8], size: [0.8, 0.3, 0.8] },
                 [PartType.DISK_DRIVE]: { pos: [0.8, 0.1, -0.8], size: [0.8, 0.3, 0.8] },
-                [PartType.TOP_CASING]: { pos: [0, 0.5, 0], size: [2.6, 0.4, 2.6] },
             };
         case 'CONTROLLER':
              return {
+                [PartType.CONTROLLER_SHELL]: { pos: [0, 0.15, 0], size: [1.8, 0.4, 0.8] },
                 [PartType.CONTROLLER_MOTHERBOARD]: { pos: [0, 0, 0], size: [1.2, 0.1, 0.6] },
                 [PartType.CONTROLLER_BATTERY]: { pos: [0, 0.1, 0], size: [0.8, 0.2, 0.5] },
                 [PartType.JOYSTICK]: { pos: [-0.4, 0.2, 0], size: [0.25, 0.3, 0.25] },
                 [PartType.BUTTONS_PAD]: { pos: [0.4, 0.2, 0], size: [0.4, 0.1, 0.4] },
-                [PartType.CONTROLLER_SHELL]: { pos: [0, 0.15, 0], size: [1.8, 0.4, 0.8] },
             };
         default:
             const _exhaustiveCheck: never = deviceType;
@@ -140,9 +140,115 @@ const PartMeshComponent: React.FC<{ part: DevicePart; size: [number, number, num
                     </mesh>
                 );
         }
+    } else if (deviceType === 'CONSOLE') {
+        switch (part.type) {
+            case PartType.TOP_CASING:
+                return (
+                    <group>
+                        {/* Main Body */}
+                        <RoundedBox args={[size[0], size[1] * 0.7, size[2]]} radius={0.05}>
+                            <meshStandardMaterial {...materialProps} />
+                        </RoundedBox>
+                        {/* Raised middle section */}
+                         <mesh position={[0, size[1] * 0.15, 0]}>
+                            <boxGeometry args={[size[0] * 0.9, size[1] * 0.4, size[2] * 0.95]} />
+                            <meshStandardMaterial {...materialProps} />
+                        </mesh>
+                        {/* Cartridge slot area */}
+                        <mesh position={[0, size[1] * 0.36, 0]}>
+                            <boxGeometry args={[1.2, 0.05, 1.8]} />
+                            <meshStandardMaterial color="#b1b9c8" />
+                        </mesh>
+                        {/* Power button */}
+                        <mesh position={[-0.9, size[1] * 0.36, 0.3]}>
+                            <boxGeometry args={[0.8, 0.06, 0.4]} />
+                            <meshStandardMaterial color="#4A55E2" />
+                        </mesh>
+                        {/* Reset button */}
+                         <mesh position={[0.9, size[1] * 0.36, 0.3]}>
+                            <boxGeometry args={[0.8, 0.06, 0.4]} />
+                            <meshStandardMaterial color="#4A55E2" />
+                        </mesh>
+                    </group>
+                );
+            default:
+                return (
+                    <mesh>
+                        <boxGeometry args={size} />
+                        <meshStandardMaterial {...materialProps} />
+                    </mesh>
+                );
+        }
+    } else if (deviceType === 'CONTROLLER') {
+        switch (part.type) {
+            case PartType.CONTROLLER_SHELL:
+                return (
+                    <group>
+                        {/* Main Body */}
+                        <RoundedBox args={[size[0], size[1], size[2] * 0.9]} radius={0.05} >
+                           <meshStandardMaterial {...materialProps} />
+                        </RoundedBox>
+                        {/* Grips */}
+                        <RoundedBox args={[size[0], size[1] * 0.8, size[2]]} radius={0.2} position={[0, -size[1]*0.1, 0]}>
+                           <meshStandardMaterial {...materialProps} />
+                        </RoundedBox>
+
+                        {/* D-Pad */}
+                        <group position={[-0.55, size[1]/2 + 0.01, 0]}>
+                            <mesh position={[0,0,0.01]}>
+                                <boxGeometry args={[0.35, 0.12, 0.1]} />
+                                <meshStandardMaterial color="#4A5568" />
+                            </mesh>
+                            <mesh position={[0,0,0.01]}>
+                                <boxGeometry args={[0.12, 0.35, 0.1]} />
+                                <meshStandardMaterial color="#4A5568" />
+                            </mesh>
+                        </group>
+
+                        {/* Face Buttons */}
+                         <group position={[0.55, size[1]/2, 0]}>
+                            <mesh position={[-0.08, 0.01, 0.1]}>
+                               <cylinderGeometry args={[0.07, 0.07, 0.1, 16]} />
+                               <meshStandardMaterial color="#b39ddb" />
+                            </mesh>
+                             <mesh position={[0.08, 0.01, -0.1]}>
+                               <cylinderGeometry args={[0.07, 0.07, 0.1, 16]} />
+                               <meshStandardMaterial color="#b39ddb" />
+                            </mesh>
+                             <mesh position={[0.18, 0.01, 0]}>
+                               <cylinderGeometry args={[0.07, 0.07, 0.1, 16]} />
+                               <meshStandardMaterial color="#9370db" />
+                            </mesh>
+                             <mesh position={[0, 0.01, 0]}>
+                               <cylinderGeometry args={[0.07, 0.07, 0.1, 16]} />
+                               <meshStandardMaterial color="#9370db" />
+                            </mesh>
+                        </group>
+
+                        {/* Select/Start */}
+                         <group position={[0, size[1]/2 + 0.01, 0]}>
+                            <mesh rotation={[0, 0, 0.2]} position={[-0.15, 0, 0]}>
+                                <capsuleGeometry args={[0.04, 0.15, 4, 8]} />
+                                <meshStandardMaterial color="#718096" />
+                            </mesh>
+                            <mesh rotation={[0, 0, 0.2]} position={[0.15, 0, 0]}>
+                                <capsuleGeometry args={[0.04, 0.15, 4, 8]} />
+                                <meshStandardMaterial color="#718096" />
+                            </mesh>
+                        </group>
+                    </group>
+                );
+            default:
+                 return (
+                    <mesh>
+                        <boxGeometry args={size} />
+                        <meshStandardMaterial {...materialProps} />
+                    </mesh>
+                );
+        }
     }
 
-    // Default for Console and Controller
+    // Fallback for any unhandled device type
     return (
         <mesh>
             <boxGeometry args={size} />
