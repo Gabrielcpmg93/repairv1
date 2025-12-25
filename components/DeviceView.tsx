@@ -1,7 +1,37 @@
 import React, { Suspense, useMemo } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Text } from '@react-three/drei';
-import { PartType, type Device, type DevicePart } from '../types';
+import { Canvas, extend } from '@react-three/fiber';
+import { OrbitControls, Text, RoundedBox, shaderMaterial } from '@react-three/drei';
+// FIX: Import DeviceType to resolve 'Cannot find name' error.
+import { PartType, type Device, type DevicePart, type DeviceType } from '../types';
+import { Color } from 'three';
+
+// --- Custom Gradient Shader Material for the Phone Screen ---
+const GradientMaterial = shaderMaterial(
+  {
+    colorA: new Color('#007cf0'), // Blue
+    colorB: new Color('#c039a3'), // Magenta/Pink
+  },
+  // Vertex Shader
+  `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  // Fragment Shader
+  `
+    varying vec2 vUv;
+    uniform vec3 colorA;
+    uniform vec3 colorB;
+    void main() {
+      // A smooth vertical gradient
+      gl_FragColor = vec4(mix(colorA, colorB, vUv.y * 1.2 - 0.1), 1.0);
+    }
+  `
+);
+extend({ GradientMaterial });
+// --- End of Shader Material ---
 
 interface DevicePart3DProps {
   part: DevicePart;
@@ -26,11 +56,11 @@ const getPartPositions = (deviceType: 'PHONE' | 'CONSOLE' | 'CONTROLLER'): Recor
     switch (deviceType) {
         case 'PHONE':
             return {
-                [PartType.SCREEN]: { pos: [0, 0, 0.05], size: [1, 2, 0.1] },
-                [PartType.MOTHERBOARD]: { pos: [0, 0, 0], size: [0.9, 1.8, 0.1] },
-                [PartType.BATTERY]: { pos: [0, 0.2, -0.1], size: [0.7, 1.2, 0.2] },
-                [PartType.CAMERA]: { pos: [0.25, 0.7, -0.05], size: [0.2, 0.2, 0.1] },
-                [PartType.BACK_COVER]: { pos: [0, 0, -0.25], size: [1.05, 2.05, 0.1] },
+                [PartType.SCREEN]: { pos: [0, 0, 0.06], size: [0.95, 2, 0.02] },
+                [PartType.MOTHERBOARD]: { pos: [0, 0, 0], size: [0.9, 1.8, 0.05] },
+                [PartType.BATTERY]: { pos: [0, 0.2, -0.05], size: [0.7, 1.2, 0.1] },
+                [PartType.CAMERA]: { pos: [0.25, 0.75, -0.02], size: [0.2, 0.2, 0.05] },
+                [PartType.BACK_COVER]: { pos: [0, 0, -0.1], size: [1, 2.05, 0.1] },
             };
         case 'CONSOLE':
             return {
@@ -54,6 +84,71 @@ const getPartPositions = (deviceType: 'PHONE' | 'CONSOLE' | 'CONTROLLER'): Recor
     }
 }
 
+
+const PartMeshComponent: React.FC<{ part: DevicePart; size: [number, number, number]; deviceType: DeviceType; }> = ({ part, size, deviceType }) => {
+    const materialProps = {
+        color: part.isBroken && !part.isAttached ? '#ff4d4d' : part.color,
+        transparent: true,
+        opacity: part.isBroken && part.isAttached ? 0.6 : 1.0,
+    };
+
+    if (deviceType === 'PHONE') {
+        switch (part.type) {
+            case PartType.SCREEN:
+                return (
+                    <group>
+                        <RoundedBox args={size} radius={0.08}>
+                            {/* @ts-ignore */}
+                            <gradientMaterial attach="material" />
+                        </RoundedBox>
+                        {/* Notch */}
+                        <mesh position={[0, size[1] / 2 - 0.05, 0.015]}>
+                            <boxGeometry args={[0.4, 0.06, 0.08]} />
+                            <meshStandardMaterial color="black" />
+                        </mesh>
+                    </group>
+                );
+            case PartType.BACK_COVER:
+                return (
+                    <group>
+                        <RoundedBox args={size} radius={0.1}>
+                            <meshStandardMaterial color="#111" metalness={0.6} roughness={0.3} />
+                        </RoundedBox>
+                        {/* Side Buttons */}
+                        <mesh position={[-size[0] / 2 - 0.01, 0.4, 0]}>
+                            <boxGeometry args={[0.02, 0.15, 0.1]} />
+                            <meshStandardMaterial color="#222" />
+                        </mesh>
+                        <mesh position={[-size[0] / 2 - 0.01, 0.1, 0]}>
+                            <boxGeometry args={[0.02, 0.3, 0.1]} />
+                            <meshStandardMaterial color="#222" />
+                        </mesh>
+                        <mesh position={[size[0] / 2 + 0.01, 0.3, 0]}>
+                            <boxGeometry args={[0.02, 0.3, 0.1]} />
+                            <meshStandardMaterial color="#222" />
+                        </mesh>
+                    </group>
+                );
+            default:
+                return (
+                    <mesh>
+                        <boxGeometry args={size} />
+                        <meshStandardMaterial {...materialProps} />
+                    </mesh>
+                );
+        }
+    }
+
+    // Default for Console and Controller
+    return (
+        <mesh>
+            <boxGeometry args={size} />
+            <meshStandardMaterial {...materialProps} />
+        </mesh>
+    );
+};
+
+
 interface DeviceViewProps {
   device: Device;
   onPartClick: (id: string) => void;
@@ -64,30 +159,15 @@ const DeviceView: React.FC<DeviceViewProps> = ({ device, onPartClick }) => {
 
   const positions = useMemo(() => getPartPositions(device.type), [device.type]);
 
-  const PartMesh: React.FC<{part: DevicePart, size: any}> = ({ part, size }) => (
-    <mesh>
-        <boxGeometry args={size} />
-        <meshStandardMaterial
-            color={part.isBroken && !part.isAttached ? '#ff4d4d' : part.color}
-            transparent
-            opacity={part.isBroken && part.isAttached ? 0.6 : 1.0}
-            polygonOffset
-            polygonOffsetFactor={-1}
-        />
-    </mesh>
-  );
-
   return (
-    <Canvas camera={{ position: [0, 2, 6], fov: 50 }}>
+    <Canvas camera={{ position: [0, 2, 4.5], fov: 50 }}>
       <Suspense fallback={null}>
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
-        <pointLight position={[-10, -10, -10]} intensity={0.5} />
+        <ambientLight intensity={1.5} />
+        <pointLight position={[10, 10, 10]} intensity={2} />
+        <pointLight position={[-10, -10, -10]} intensity={1} />
         <Text position={[0, -2.5, 0]} fontSize={0.3} color="white" anchorX="center" >{device.name}</Text>
 
         <group>
-          {/* FIX: Replaced Object.entries with Object.keys to work around a TypeScript type inference issue.
-              This ensures `pos` and `size` can be correctly destructured from the `positions` object. */}
           {Object.keys(positions).map((type, index) => {
             const { pos, size } = positions[type as PartType];
             const part = getPart(type as PartType);
@@ -102,7 +182,7 @@ const DeviceView: React.FC<DeviceViewProps> = ({ device, onPartClick }) => {
             return (
               <group key={part.id} position={currentPosition}>
                 <DevicePart3D part={part} onClick={onPartClick}>
-                    <PartMesh part={part} size={size} />
+                    <PartMeshComponent part={part} size={size} deviceType={device.type} />
                 </DevicePart3D>
                  {part.isBroken && (
                     <Text
