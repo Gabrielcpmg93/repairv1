@@ -15,8 +15,7 @@ const RetroDeviceImage: React.FC<{type: DeviceType}> = ({ type }) => {
                 <div className="w-12 h-20 bg-blue-300 rounded-sm"></div>
             </div>
         )
-    }
-    if (type === 'CONSOLE') {
+    } else if (type === 'CONSOLE') {
         return (
             <div className="w-24 h-16 bg-gray-300 border-2 border-gray-500 rounded-md mx-auto flex items-center justify-center p-1">
                  <div className="w-full h-full bg-gray-800 rounded-sm flex items-center justify-center">
@@ -24,13 +23,26 @@ const RetroDeviceImage: React.FC<{type: DeviceType}> = ({ type }) => {
                  </div>
             </div>
         )
-    }
-    if (type === 'CONTROLLER') {
+    } else if (type === 'CONTROLLER') {
         return (
             <div className="w-24 h-16 bg-gray-800 border-2 border-gray-500 rounded-lg mx-auto relative flex items-center justify-center">
                 <div className="absolute left-1 top-4 w-2 h-6 bg-gray-600 rounded-l-md"></div>
                 <div className="absolute right-1 top-4 w-2 h-6 bg-gray-600 rounded-r-md"></div>
                 <div className="w-6 h-6 bg-gray-600 rounded-full"></div>
+            </div>
+        )
+    } else if (type === 'RADIO') {
+        return (
+            <div className="w-24 h-16 bg-yellow-900 border-2 border-yellow-700 rounded-md mx-auto relative p-1">
+                <div className="absolute top-1 right-1 w-1 h-8 bg-gray-400"></div>
+                <div className="w-8 h-8 bg-black rounded-full absolute left-2 top-3"></div>
+            </div>
+        )
+    } else if (type === 'TELEVISION') {
+        return (
+            <div className="w-24 h-16 bg-gray-800 border-2 border-gray-600 rounded-md mx-auto flex flex-col items-center justify-end p-1">
+                <div className="w-20 h-12 bg-black border-2 border-gray-700 rounded-sm"></div>
+                <div className="w-8 h-1 bg-gray-600 mt-1"></div>
             </div>
         )
     }

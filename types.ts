@@ -1,6 +1,6 @@
 
 export type GameState = 'MENU' | 'PLAYING' | 'COMPUTER' | 'SETTING_PRICE' | 'DELIVERING' | 'SPONSORSHIP' | 'REPAIR_HISTORY';
-export type DeviceType = 'PHONE' | 'CONSOLE' | 'CONTROLLER';
+export type DeviceType = 'PHONE' | 'CONSOLE' | 'CONTROLLER' | 'RADIO' | 'TELEVISION';
 
 export enum PartType {
   // Phone Parts
@@ -23,6 +23,20 @@ export enum PartType {
   CONTROLLER_MOTHERBOARD = 'Placa-mãe de Controle',
   JOYSTICK = 'Joystick',
   BUTTONS_PAD = 'Botões de Ação',
+
+  // Radio Parts
+  RADIO_CASING = 'Carcaça de Rádio',
+  SPEAKER = 'Alto-falante',
+  ANTENNA = 'Antena',
+  RADIO_TUNER = 'Sintonizador de Rádio',
+  RADIO_PSU = 'Fonte de Rádio',
+
+  // Television Parts
+  TV_PANEL = 'Painel de LED',
+  TV_MAINBOARD = 'Placa Principal de TV',
+  TV_PSU = 'Fonte de TV',
+  T_CON_BOARD = 'Placa T-Con',
+  TV_CASING = 'Carcaça de TV',
 }
 
 export interface DevicePart {

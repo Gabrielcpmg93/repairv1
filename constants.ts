@@ -21,7 +21,7 @@ export const PARTS_CATALOG: StoreItem[] = [
   
   // Console Parts
   { id: PartType.TOP_CASING, name: "Carcaça Superior (Nintari-S)", price: 800, brand: "Nintari", image: "white" },
-  { id: PartType.DISK_DRIVE, name: "Conector de Cartucho", price: 1100, brand: "Nintari", image: "dark-gray" },
+  { id: PartType.DISK_DRIVE, name: "Leitor de Disco / Cartucho", price: 1100, brand: "Nintari", image: "dark-gray" },
   { id: PartType.FAN, name: "Ventoinha de Exaustão", price: 450, brand: "Nintari", image: "black" },
   { id: PartType.PSU, name: "Fonte de Alimentação Interna", price: 950, brand: "Nintari", image: "gray" },
   { id: PartType.CONSOLE_MOTHERBOARD, name: "Placa-mãe (Nintari-S)", price: 1500, brand: "Nintari", image: "dark-green" },
@@ -32,4 +32,18 @@ export const PARTS_CATALOG: StoreItem[] = [
   { id: PartType.CONTROLLER_MOTHERBOARD, name: "Placa de Circuito (Controle)", price: 400, brand: "Nintari", image: "green" },
   { id: PartType.JOYSTICK, name: "Módulo Analógico Joystick", price: 150, brand: "Nintari", image: "dark-gray" },
   { id: PartType.BUTTONS_PAD, name: "Botões de Ação e D-Pad", price: 120, brand: "Nintari", image: "multi-color" },
+
+  // Radio Parts
+  { id: PartType.RADIO_CASING, name: "Carcaça de Rádio Vintage", price: 400, brand: "Sonosonic", image: "brown" },
+  { id: PartType.SPEAKER, name: "Alto-falante 10W", price: 250, brand: "Sonosonic", image: "black" },
+  { id: PartType.ANTENNA, name: "Antena Telescópica", price: 100, brand: "SignalMax", image: "gray" },
+  { id: PartType.RADIO_TUNER, name: "Placa Sintonizadora AM/FM", price: 350, brand: "Sonosonic", image: "green" },
+  { id: PartType.RADIO_PSU, name: "Fonte de Alimentação de Rádio", price: 200, brand: "Voltz", image: "dark-gray" },
+
+  // Television Parts
+  { id: PartType.TV_CASING, name: "Carcaça Traseira de TV LED", price: 600, brand: "Panaview", image: "black" },
+  { id: PartType.TV_PANEL, name: "Painel de LED 42 pol.", price: 1800, brand: "Panaview", image: "black" },
+  { id: PartType.TV_MAINBOARD, name: "Placa Principal de TV", price: 900, brand: "Panaview", image: "dark-green" },
+  { id: PartType.TV_PSU, name: "Fonte de Alimentação de TV", price: 750, brand: "Voltz", image: "gray" },
+  { id: PartType.T_CON_BOARD, name: "Placa T-Con (Controladora)", price: 450, brand: "Panaview", image: "green" },
 ];

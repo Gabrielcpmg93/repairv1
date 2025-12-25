@@ -53,7 +53,7 @@ const DevicePart3D: React.FC<DevicePart3DProps> = ({ part, onClick, children }) 
   );
 };
 
-const getPartPositions = (deviceType: 'PHONE' | 'CONSOLE' | 'CONTROLLER'): Record<string, { pos: [number, number, number]; size: [number, number, number] }> => {
+const getPartPositions = (deviceType: DeviceType): Record<string, { pos: [number, number, number]; size: [number, number, number] }> => {
     switch (deviceType) {
         case 'PHONE':
             // FIX: Adjusted Z-positions to prevent visual clipping/Z-fighting.
@@ -80,6 +80,22 @@ const getPartPositions = (deviceType: 'PHONE' | 'CONSOLE' | 'CONTROLLER'): Recor
                 [PartType.CONTROLLER_BATTERY]: { pos: [0, 0.1, 0], size: [0.8, 0.2, 0.5] },
                 [PartType.JOYSTICK]: { pos: [-0.4, 0.2, 0], size: [0.25, 0.3, 0.25] },
                 [PartType.BUTTONS_PAD]: { pos: [0.4, 0.2, 0], size: [0.4, 0.1, 0.4] },
+            };
+        case 'RADIO':
+            return {
+                [PartType.RADIO_CASING]: { pos: [0, 0, -0.1], size: [2, 1.2, 0.8] },
+                [PartType.SPEAKER]: { pos: [-0.5, 0, 0.2], size: [0.8, 0.8, 0.2] },
+                [PartType.RADIO_TUNER]: { pos: [0.5, -0.2, 0.1], size: [0.6, 0.6, 0.1] },
+                [PartType.RADIO_PSU]: { pos: [0.5, 0.3, 0], size: [0.5, 0.4, 0.4] },
+                [PartType.ANTENNA]: { pos: [0.8, 0.6, 0], size: [0.05, 1, 0.05] },
+            };
+        case 'TELEVISION':
+            return {
+                [PartType.TV_PANEL]: { pos: [0, 0, 0.05], size: [3.5, 2, 0.05] },
+                [PartType.TV_CASING]: { pos: [0, 0, -0.1], size: [3.6, 2.1, 0.1] },
+                [PartType.TV_MAINBOARD]: { pos: [-0.5, 0, -0.05], size: [1, 1.2, 0.05] },
+                [PartType.TV_PSU]: { pos: [0.8, 0.4, -0.05], size: [0.8, 0.8, 0.05] },
+                [PartType.T_CON_BOARD]: { pos: [0, -0.8, -0.05], size: [1.5, 0.2, 0.05] },
             };
         default:
             const _exhaustiveCheck: never = deviceType;
@@ -246,7 +262,74 @@ const PartMeshComponent: React.FC<{ part: DevicePart; size: [number, number, num
                     </mesh>
                 );
         }
+    } else if (deviceType === 'RADIO') {
+        switch (part.type) {
+            case PartType.RADIO_CASING:
+                return (
+                    <group>
+                        <RoundedBox args={size} radius={0.05}>
+                            <meshStandardMaterial {...materialProps} />
+                        </RoundedBox>
+                        {/* Speaker Grill */}
+                        <mesh position={[-0.5, 0, size[2] / 2 + 0.01]}>
+                            <planeGeometry args={[0.7, 0.7]} />
+                            <meshStandardMaterial color="#222" />
+                        </mesh>
+                        {/* Tuner Dial */}
+                        <mesh position={[0.5, 0.2, size[2] / 2 + 0.01]} rotation={[Math.PI / 2, 0, 0]}>
+                            <cylinderGeometry args={[0.2, 0.2, 0.1, 32]} />
+                            <meshStandardMaterial color="#DDD" />
+                        </mesh>
+                    </group>
+                );
+            case PartType.ANTENNA:
+                 return (
+                     <mesh position={[0, size[1]/2, 0]}>
+                        <cylinderGeometry args={[size[0]/2, size[0]/2, size[1], 8]} />
+                        <meshStandardMaterial {...materialProps} />
+                     </mesh>
+                 );
+            default:
+                 return (
+                    <mesh>
+                        <boxGeometry args={size} />
+                        <meshStandardMaterial {...materialProps} />
+                    </mesh>
+                );
+        }
+    } else if (deviceType === 'TELEVISION') {
+        switch (part.type) {
+            case PartType.TV_PANEL:
+                return (
+                    <mesh>
+                        <boxGeometry args={size} />
+                        <meshStandardMaterial color="#000" emissive="#050505" roughness={0.2} metalness={0.1} />
+                    </mesh>
+                );
+            case PartType.TV_CASING:
+                 return (
+                     <group>
+                        <mesh>
+                            <boxGeometry args={size} />
+                            <meshStandardMaterial {...materialProps} />
+                        </mesh>
+                        {/* Stand */}
+                        <mesh position={[0, -size[1]/2 - 0.1, 0]}>
+                            <boxGeometry args={[1, 0.2, 0.5]} />
+                            <meshStandardMaterial {...materialProps} />
+                        </mesh>
+                     </group>
+                 );
+            default:
+                 return (
+                    <mesh>
+                        <boxGeometry args={size} />
+                        <meshStandardMaterial {...materialProps} />
+                    </mesh>
+                );
+        }
     }
+
 
     // Fallback for any unhandled device type
     return (

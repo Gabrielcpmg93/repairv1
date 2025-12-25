@@ -27,6 +27,7 @@ const PartImage: React.FC<{image: string}> = ({ image }) => {
     if(image === 'dark-gray') colorClass = 'bg-gray-600';
     if(image === 'purple') colorClass = 'bg-purple-600';
     if(image === 'white') colorClass = 'bg-gray-100';
+    if(image === 'brown') colorClass = 'bg-yellow-800';
 
     if (image === 'multi-color') {
         return (

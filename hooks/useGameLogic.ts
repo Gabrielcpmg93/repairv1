@@ -43,7 +43,34 @@ const generateController = (): Device => {
     return { id: `controller-${Date.now()}`, name: 'Super Retro Pad', type: 'CONTROLLER', parts };
 };
 
-const deviceGenerators = [generatePhone, generateConsole, generateController];
+const generateRadio = (): Device => {
+    const parts: DevicePart[] = [
+        { id: 'r1', type: PartTypeEnum.RADIO_CASING, isBroken: false, isAttached: true, color: '#8B4513' }, // SaddleBrown
+        { id: 'r2', type: PartTypeEnum.SPEAKER, isBroken: false, isAttached: true, color: '#333333' },
+        { id: 'r3', type: PartTypeEnum.ANTENNA, isBroken: false, isAttached: true, color: '#C0C0C0' }, // Silver
+        { id: 'r4', type: PartTypeEnum.RADIO_TUNER, isBroken: false, isAttached: true, color: '#2f855a' },
+        { id: 'r5', type: PartTypeEnum.RADIO_PSU, isBroken: false, isAttached: true, color: '#4a5568' },
+    ];
+    const partToBreakIndex = Math.floor(Math.random() * parts.length);
+    parts[partToBreakIndex].isBroken = true;
+    return { id: `radio-${Date.now()}`, name: 'Rádio Transistor Vintage', type: 'RADIO', parts };
+};
+
+const generateTelevision = (): Device => {
+    const parts: DevicePart[] = [
+        { id: 'tv1', type: PartTypeEnum.TV_CASING, isBroken: false, isAttached: true, color: '#2d3748' },
+        { id: 'tv2', type: PartTypeEnum.TV_PANEL, isBroken: false, isAttached: true, color: '#1a202c' },
+        { id: 'tv3', type: PartTypeEnum.TV_MAINBOARD, isBroken: false, isAttached: true, color: '#2f855a' },
+        { id: 'tv4', type: PartTypeEnum.TV_PSU, isBroken: false, isAttached: true, color: '#a0aec0' },
+        { id: 'tv5', type: PartTypeEnum.T_CON_BOARD, isBroken: false, isAttached: true, color: '#48bb78' },
+    ];
+    const partToBreakIndex = Math.floor(Math.random() * parts.length);
+    parts[partToBreakIndex].isBroken = true;
+    return { id: `television-${Date.now()}`, name: 'TV de LED Panaview', type: 'TELEVISION', parts };
+};
+
+
+const deviceGenerators = [generatePhone, generateConsole, generateController, generateRadio, generateTelevision];
 
 export default function useGameLogic() {
     const [money, setMoney] = useState(INITIAL_MONEY);
