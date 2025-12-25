@@ -50,7 +50,7 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, inventory, repai
 
   const inventoryCounts = useMemo(() => {
     return inventory.reduce((acc, part) => {
-        if (part) { // Defensive check
+        if (part) { 
             acc[part] = (acc[part] || 0) + 1;
         }
         return acc;
@@ -132,68 +132,81 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, inventory, repai
   );
 
   const renderSell = () => {
-    const sellableParts = Object.keys(inventoryCounts) as PartType[];
+    // Robust selling item calculation to prevent crashes.
+    const sellableItems = useMemo(() => {
+        return (Object.keys(inventoryCounts) as PartType[])
+            .map(partType => {
+                return {
+                    partType,
+                    count: inventoryCounts[partType],
+                    storeItem: PARTS_CATALOG.find(p => p.id === partType),
+                };
+            })
+            // This filter is the core bug fix: it ensures we only try to render items that exist.
+            .filter(item => item.storeItem && item.count > 0);
+    }, [inventoryCounts]);
 
     return (
-        <div>
+        <div className="text-black">
             {sellingItems.length > 0 && (
-                <div className="mb-4 p-2 bg-blue-100 border border-blue-300 rounded">
-                    <h3 className="font-bold text-black">Vendas em Progresso...</h3>
-                    <ul className="text-sm text-black">
+                <div className="mb-4 p-3 bg-blue-100 border border-blue-300 rounded-lg shadow-inner">
+                    <h3 className="font-bold text-lg text-blue-800 mb-2">Vendas em Progresso...</h3>
+                    <ul className="space-y-1">
                         {sellingItems.map(item => (
-                            <li key={item.id} className="animate-pulse">Vendendo {item.part} por R$ {item.price.toLocaleString('pt-BR')} (2s)</li>
+                            <li key={item.id} className="animate-pulse text-sm text-blue-700">
+                                Vendendo {item.part} por R$ {item.price.toLocaleString('pt-BR')}...
+                            </li>
                         ))}
                     </ul>
                 </div>
             )}
-            {sellableParts.length === 0 && sellingItems.length === 0 && <p className="text-black">Você não tem peças para vender.</p>}
-            <table className="w-full text-black border-collapse">
-                <thead>
-                    <tr className="text-left bg-gray-200">
-                        <th className="p-2 border-b-2 border-gray-300">Peça</th>
-                        <th className="p-2 border-b-2 border-gray-300">Quantidade</th>
-                        <th className="p-2 border-b-2 border-gray-300">Preço de Venda</th>
-                        <th className="p-2 border-b-2 border-gray-300">Ação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {sellableParts.map(partType => {
-                        const storeItem = PARTS_CATALOG.find(p => p.id === partType);
-                        
-                        // CRITICAL FIX: If a part in inventory doesn't exist in the catalog,
-                        // skip rendering it to prevent a crash.
-                        if (!storeItem) {
-                          return null;
-                        }
+            
+            {sellableItems.length === 0 && sellingItems.length === 0 && (
+                <div className="text-center py-10">
+                    <TagIcon className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-600">Você não tem peças para vender.</p>
+                    <p className="text-sm text-gray-500">Compre ou crie peças para começar a vender.</p>
+                </div>
+            )}
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {sellableItems.map(({ partType, count, storeItem }) => {
+                    // This check is now redundant due to the filter, but adds extra safety.
+                    if (!storeItem) return null; 
 
-                        const price = sellPrices[partType] || Math.floor(storeItem.price * 0.5);
+                    const price = sellPrices[partType] || Math.floor(storeItem.price * 0.5);
 
-                        return (
-                            <tr key={partType} className="hover:bg-green-100">
-                                <td className="p-3 border-b border-gray-200 font-bold">{partType}</td>
-                                <td className="p-3 border-b border-gray-200">{inventoryCounts[partType]}</td>
-                                <td className="p-3 border-b border-gray-200">
+                    return (
+                        <div key={partType} className="bg-gray-100 border border-gray-300 rounded-lg p-3 flex flex-col shadow-sm">
+                            <div className="flex items-center mb-3">
+                                <PartImage image={storeItem.image} />
+                                <div className="ml-3">
+                                    <p className="font-bold text-sm leading-tight">{storeItem.name}</p>
+                                    <p className="text-xs text-gray-600">Em estoque: {count}</p>
+                                </div>
+                            </div>
+                            <div className="mt-auto space-y-2">
+                                <div className="flex items-center">
+                                    <span className="text-sm font-semibold mr-2">Preço: R$</span>
                                     <input 
                                         type="number" 
                                         value={price}
-                                        onChange={(e) => setSellPrices({...sellPrices, [partType]: Number(e.target.value)})}
-                                        className="w-24 p-1 border border-gray-400 rounded-sm"
+                                        onChange={(e) => setSellPrices({...sellPrices, [partType]: Math.max(1, Number(e.target.value))})}
+                                        className="w-full p-1 border border-gray-400 rounded-sm text-sm"
                                         min="1"
                                     />
-                                </td>
-                                <td className="p-3 border-b border-gray-200">
-                                    <button
-                                        onClick={() => onSellPart(partType, price)}
-                                        className="bg-cyan-500 text-white font-bold px-4 py-1.5 rounded-sm border-2 border-b-cyan-700 border-r-cyan-700 border-t-cyan-400 border-l-cyan-400 hover:bg-cyan-600 active:border-t-cyan-700 active:border-l-cyan-700"
-                                    >
-                                        Vender
-                                    </button>
-                                </td>
-                            </tr>
-                        )
-                    })}
-                </tbody>
-            </table>
+                                </div>
+                                <button
+                                    onClick={() => onSellPart(partType, price)}
+                                    className="w-full bg-cyan-500 text-white font-bold py-1.5 rounded-md border-b-2 border-cyan-700 hover:bg-cyan-600 active:bg-cyan-700 transition-all text-sm"
+                                >
+                                    Vender 1 Unidade
+                                </button>
+                            </div>
+                        </div>
+                    )
+                })}
+            </div>
         </div>
     );
   }
