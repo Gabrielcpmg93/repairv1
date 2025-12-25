@@ -10,6 +10,7 @@ interface GameScreenProps {
   currentDevice: Device | null;
   roundCompleted: boolean;
   onShowComputer: () => void;
+  onShowContracts: () => void;
   togglePartAttachment: (partId: string) => void;
   swapPart: (partId: string) => void;
   onStartDelivery: () => void;
@@ -29,6 +30,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
   currentDevice,
   roundCompleted,
   onShowComputer,
+  onShowContracts,
   togglePartAttachment,
   swapPart,
   onStartDelivery,
@@ -41,10 +43,10 @@ const GameScreen: React.FC<GameScreenProps> = ({
       <header className="flex justify-between items-center p-4 bg-gray-900 shadow-lg z-10">
         <h1 className="text-2xl font-bold text-cyan-400">Bancada de Reparos</h1>
         <div className="flex items-center space-x-4">
-          <div className="flex items-center bg-gray-700 px-3 py-1 rounded-full">
+          <button onClick={onShowContracts} className="flex items-center bg-gray-700 px-3 py-1 rounded-full hover:bg-gray-600 transition-colors">
             <MoneyIcon className="w-6 h-6 text-yellow-400 mr-2" />
             <span className="text-lg font-semibold">R$ {money.toLocaleString('pt-BR')}</span>
-          </div>
+          </button>
           <button onClick={onShowComputer} className="p-3 bg-gray-700 rounded-full hover:bg-cyan-600 transition-colors">
             <ComputerIcon className="w-6 h-6" />
           </button>
@@ -67,7 +69,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
               )}
             </div>
           </div>
-           <div className="flex-grow">
+           <div>
             <h2 className="text-lg font-bold mb-2 border-b-2 border-cyan-500 pb-1">Peças Removidas</h2>
              <div className="space-y-2 mt-2">
                 {detachedParts.length > 0 ? (

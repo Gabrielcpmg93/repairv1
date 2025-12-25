@@ -6,6 +6,7 @@ import useGameLogic from './hooks/useGameLogic';
 import ComputerScreen from './components/ComputerScreen';
 import SetPriceScreen from './components/SetPriceScreen';
 import DeliveryMapScreen from './components/DeliveryMapScreen';
+import ContractsScreen from './components/ContractsScreen';
 import type { GameState } from './types';
 
 export default function App() {
@@ -18,13 +19,10 @@ export default function App() {
     setGameState('PLAYING');
   }, [gameLogic]);
 
-  const showComputer = useCallback(() => {
-    setGameState('COMPUTER');
-  }, []);
-
-  const hideComputer = useCallback(() => {
-    setGameState('PLAYING');
-  }, []);
+  const showComputer = useCallback(() => setGameState('COMPUTER'), []);
+  const hideComputer = useCallback(() => setGameState('PLAYING'), []);
+  const showContracts = useCallback(() => setGameState('CONTRACTS'), []);
+  const hideContracts = useCallback(() => setGameState('PLAYING'), []);
   
   const handleStartDelivery = useCallback(() => {
     setGameState('SETTING_PRICE');
@@ -49,10 +47,11 @@ export default function App() {
     <div className="bg-gray-800 text-white w-screen h-screen overflow-hidden font-sans">
       {gameState === 'MENU' && <MainMenu onStartGame={startGame} />}
       
-      {(gameState === 'PLAYING' || gameState === 'COMPUTER') && (
+      {(gameState === 'PLAYING' || gameState === 'COMPUTER' || gameState === 'CONTRACTS') && (
         <GameScreen
           {...gameLogic}
           onShowComputer={showComputer}
+          onShowContracts={showContracts}
           onStartDelivery={handleStartDelivery}
         />
       )}
@@ -63,6 +62,14 @@ export default function App() {
           inventory={gameLogic.inventory}
           onBuyPart={gameLogic.buyPart}
           onClose={hideComputer}
+        />
+      )}
+       
+      {gameState === 'CONTRACTS' && (
+        <ContractsScreen
+          activeContract={gameLogic.activeContract}
+          onSignContract={gameLogic.signContract}
+          onClose={hideContracts}
         />
       )}
       

@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
-import type { Device, DevicePart, PartType, StoreItem, DeviceType } from '../types';
-import { INITIAL_MONEY } from '../constants';
+import type { Device, DevicePart, PartType, StoreItem, Contract } from '../types';
+import { INITIAL_MONEY, REPAIRS_PER_CONTRACT } from '../constants';
 import { PartType as PartTypeEnum } from '../types';
 
 const generatePhone = (): Device => {
@@ -50,6 +50,7 @@ export default function useGameLogic() {
     const [inventory, setInventory] = useState<PartType[]>([]);
     const [currentDevice, setCurrentDevice] = useState<Device | null>(null);
     const [roundCompleted, setRoundCompleted] = useState(false);
+    const [activeContract, setActiveContract] = useState<{ id: string, repairsLeft: number } | null>(null);
 
     const startNewRound = useCallback(() => {
         const randomGenerator = deviceGenerators[Math.floor(Math.random() * deviceGenerators.length)];
@@ -59,8 +60,15 @@ export default function useGameLogic() {
 
     const collectPaymentAndStartNewRound = useCallback((price: number) => {
         setMoney(prev => prev + price);
+        if (activeContract) {
+            setActiveContract(prev => {
+                if (!prev) return null;
+                const repairsLeft = prev.repairsLeft - 1;
+                return repairsLeft > 0 ? { ...prev, repairsLeft } : null;
+            });
+        }
         startNewRound();
-    }, [startNewRound]);
+    }, [startNewRound, activeContract]);
     
     const buyPart = useCallback((item: StoreItem) => {
         if (money >= item.price) {
@@ -124,15 +132,26 @@ export default function useGameLogic() {
        });
     }, [inventory, checkWinCondition]);
 
+    const signContract = useCallback((contract: Contract) => {
+        if(activeContract) {
+            alert("Você já tem um contrato ativo!");
+            return;
+        }
+        setMoney(prev => prev + contract.payment);
+        setActiveContract({ id: contract.id, repairsLeft: contract.durationInRepairs });
+    }, [activeContract]);
+
     return {
         money,
         inventory,
         currentDevice,
         roundCompleted,
+        activeContract,
         startNewRound,
         collectPaymentAndStartNewRound,
         buyPart,
         togglePartAttachment,
         swapPart,
+        signContract,
     };
 }
