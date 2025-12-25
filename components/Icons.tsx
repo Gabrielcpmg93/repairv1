@@ -43,3 +43,9 @@ export const HammerIcon: React.FC<{ className?: string }> = ({ className }) => (
         <path d="M2 21.3V11l5.4-4.5l3.2,3.2L4.5,15H13v-3l4-3.5l-3-3L21,2.2L22.8,4L16,10.8l3,3l3.5-4l1.8,1.8l-3.3,3.3l3,3 l-10.7,5.2H2z M12.5,16v3h-3v-3H12.5z"/>
     </svg>
 );
+
+export const TagIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12.9 2.6L2.6 12.9c-.6.6-.6 1.5 0 2.1l6.4 6.4c.6.6 1.5.6 2.1 0l10.3-10.3V4c0-.8-.7-1.5-1.5-1.5h-7zm-1.9 8.4c-.8.8-2.1.8-2.8 0-.8-.8-.8-2.1 0-2.8.8-.8 2.1-.8 2.8 0 .8.8.8 2.1 0 2.8z"/>
+    </svg>
+);

@@ -52,6 +52,7 @@ export default function useGameLogic() {
     const [repairedDevices, setRepairedDevices] = useState<Device[]>([]);
     const [roundCompleted, setRoundCompleted] = useState(false);
     const [sponsorshipActive, setSponsorshipActive] = useState(false);
+    const [sellingItems, setSellingItems] = useState<{ part: PartType; price: number; id: string }[]>([]);
 
     useEffect(() => {
         if (sponsorshipActive) {
@@ -96,6 +97,29 @@ export default function useGameLogic() {
         alert("Dinheiro insuficiente para criar esta peça!");
         return false;
     }, [money]);
+
+    const sellPart = useCallback((partType: PartType, price: number) => {
+        const inventoryIndex = inventory.lastIndexOf(partType);
+        if (inventoryIndex === -1) {
+            alert("Peça não encontrada no inventário!");
+            return false;
+        }
+
+        const newInventory = [...inventory];
+        newInventory.splice(inventoryIndex, 1);
+        setInventory(newInventory);
+
+        const saleId = `${partType}-${Date.now()}`;
+        const newSellingItem = { part: partType, price, id: saleId };
+        setSellingItems(prev => [...prev, newSellingItem]);
+
+        setTimeout(() => {
+            setMoney(prev => prev + price);
+            setSellingItems(prev => prev.filter(item => item.id !== saleId));
+        }, 2000);
+
+        return true;
+    }, [inventory]);
 
     const checkWinCondition = useCallback((device: Device) => {
         if (roundCompleted) return;
@@ -161,10 +185,12 @@ export default function useGameLogic() {
         repairedDevices,
         roundCompleted,
         sponsorshipActive,
+        sellingItems,
         startNewRound,
         collectPaymentAndStartNewRound,
         buyPart,
         craftPart,
+        sellPart,
         togglePartAttachment,
         swapPart,
         signSponsorship,

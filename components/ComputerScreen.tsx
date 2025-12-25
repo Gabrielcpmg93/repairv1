@@ -1,15 +1,17 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { StoreItem, PartType } from '../types';
 import { PARTS_CATALOG } from '../constants';
-import { CloseIcon, CartIcon, HammerIcon, MoneyIcon } from './Icons';
+import { CloseIcon, CartIcon, HammerIcon, MoneyIcon, TagIcon } from './Icons';
 
 interface ComputerScreenProps {
   money: number;
   inventory: PartType[];
   repairCount: number;
+  sellingItems: { part: PartType; price: number; id: string }[];
   onBuyPart: (item: StoreItem) => void;
   onCraftPart: (item: StoreItem) => void;
+  onSellPart: (part: PartType, price: number) => void;
   onClose: () => void;
 }
 
@@ -40,9 +42,18 @@ const PartImage: React.FC<{image: string}> = ({ image }) => {
     return <div className={`w-12 h-12 ${colorClass} rounded-md border-2 border-gray-400`}></div>;
 }
 
-const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, repairCount, onBuyPart, onCraftPart, onClose }) => {
-  const [view, setView] = useState<'store' | 'crafting'>('store');
+const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, inventory, repairCount, sellingItems, onBuyPart, onCraftPart, onSellPart, onClose }) => {
+  const [view, setView] = useState<'store' | 'crafting' | 'sell'>('store');
+  const [sellPrices, setSellPrices] = useState<Partial<Record<PartType, number>>>({});
+
   const isCraftingUnlocked = repairCount >= CRAFTING_UNLOCK_COUNT;
+
+  const inventoryCounts = useMemo(() => {
+    return inventory.reduce((acc, part) => {
+        acc[part] = (acc[part] || 0) + 1;
+        return acc;
+    }, {} as Record<PartType, number>);
+  }, [inventory]);
 
   const renderStore = () => (
     <table className="w-full text-black border-collapse">
@@ -118,6 +129,66 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, repairCount, onB
     </table>
   );
 
+  const renderSell = () => {
+    const sellableParts = Object.keys(inventoryCounts) as PartType[];
+
+    return (
+        <div>
+            {sellingItems.length > 0 && (
+                <div className="mb-4 p-2 bg-blue-100 border border-blue-300 rounded">
+                    <h3 className="font-bold text-black">Vendas em Progresso...</h3>
+                    <ul className="text-sm text-black">
+                        {sellingItems.map(item => (
+                            <li key={item.id} className="animate-pulse">Vendendo {item.part} por R$ {item.price.toLocaleString('pt-BR')} (2s)</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+            {sellableParts.length === 0 && sellingItems.length === 0 && <p className="text-black">Você não tem peças para vender.</p>}
+            <table className="w-full text-black border-collapse">
+                <thead>
+                    <tr className="text-left bg-gray-200">
+                        <th className="p-2 border-b-2 border-gray-300">Peça</th>
+                        <th className="p-2 border-b-2 border-gray-300">Quantidade</th>
+                        <th className="p-2 border-b-2 border-gray-300">Preço de Venda</th>
+                        <th className="p-2 border-b-2 border-gray-300">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {sellableParts.map(partType => {
+                        const storeItem = PARTS_CATALOG.find(p => p.id === partType)!;
+                        const price = sellPrices[partType] || Math.floor(storeItem.price * 0.5);
+
+                        return (
+                            <tr key={partType} className="hover:bg-green-100">
+                                <td className="p-3 border-b border-gray-200 font-bold">{partType}</td>
+                                <td className="p-3 border-b border-gray-200">{inventoryCounts[partType]}</td>
+                                <td className="p-3 border-b border-gray-200">
+                                    <input 
+                                        type="number" 
+                                        value={price}
+                                        onChange={(e) => setSellPrices({...sellPrices, [partType]: Number(e.target.value)})}
+                                        className="w-24 p-1 border border-gray-400 rounded-sm"
+                                        min="1"
+                                    />
+                                </td>
+                                <td className="p-3 border-b border-gray-200">
+                                    <button
+                                        onClick={() => onSellPart(partType, price)}
+                                        className="bg-cyan-500 text-white font-bold px-4 py-1.5 rounded-sm border-2 border-b-cyan-700 border-r-cyan-700 border-t-cyan-400 border-l-cyan-400 hover:bg-cyan-600 active:border-t-cyan-700 active:border-l-cyan-700"
+                                    >
+                                        Vender
+                                    </button>
+                                </td>
+                            </tr>
+                        )
+                    })}
+                </tbody>
+            </table>
+        </div>
+    );
+  }
+
 
   return (
     <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
@@ -131,14 +202,14 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, repairCount, onB
         </div>
 
         <div className="bg-gray-200 p-1 border-b-2 border-gray-400 flex items-center space-x-2">
-            <button onClick={() => setView('store')} className={`font-bold px-3 py-1 border-2 ${view === 'store' ? 'bg-gray-100 border-b-gray-100' : 'bg-gray-300 hover:bg-gray-100'}`}>
+            <button onClick={() => setView('store')} className={`font-bold px-3 py-1 border-2 text-black ${view === 'store' ? 'bg-gray-100 border-b-gray-100' : 'bg-gray-300 hover:bg-gray-100'}`}>
                 <CartIcon className="w-5 h-5 inline-block mr-2"/>
                 Peças - Packuten
             </button>
             <button 
               onClick={() => isCraftingUnlocked && setView('crafting')} 
               disabled={!isCraftingUnlocked}
-              className={`font-bold px-3 py-1 border-2 disabled:cursor-not-allowed disabled:text-gray-500 relative group ${view === 'crafting' ? 'bg-gray-100 border-b-gray-100' : 'bg-gray-300 hover:bg-gray-100'}`}
+              className={`font-bold px-3 py-1 border-2 disabled:cursor-not-allowed disabled:text-gray-500 relative group text-black ${view === 'crafting' ? 'bg-gray-100 border-b-gray-100' : 'bg-gray-300 hover:bg-gray-100'}`}
             >
                 <HammerIcon className="w-5 h-5 inline-block mr-2"/>
                 Bancada de Criação
@@ -147,6 +218,10 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, repairCount, onB
                     Conserte {CRAFTING_UNLOCK_COUNT} aparelhos para desbloquear.
                   </span>
                 )}
+            </button>
+             <button onClick={() => setView('sell')} className={`font-bold px-3 py-1 border-2 text-black ${view === 'sell' ? 'bg-gray-100 border-b-gray-100' : 'bg-gray-300 hover:bg-gray-100'}`}>
+                <TagIcon className="w-5 h-5 inline-block mr-2"/>
+                Vender Peças
             </button>
             <div className="flex-grow"></div>
             <div className="flex items-center bg-black text-white px-2 py-0.5 rounded-sm">
@@ -157,12 +232,16 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, repairCount, onB
 
         <div className="bg-gray-200 p-2 border-b-2 border-gray-400">
             <p className="text-black bg-white p-1 border-2 border-gray-500 border-r-gray-100 border-b-gray-100">
-                {view === 'store' ? 'www.packuten.co.jp' : 'local://workbench/crafting'}
+                {view === 'store' && 'www.packuten.co.jp'}
+                {view === 'crafting' && 'local://workbench/crafting'}
+                {view === 'sell' && 'local://marketplace/sell'}
             </p>
         </div>
 
         <div className="flex-1 bg-white p-4 overflow-y-auto">
-            {view === 'store' ? renderStore() : renderCrafting()}
+            {view === 'store' && renderStore()}
+            {view === 'crafting' && renderCrafting()}
+            {view === 'sell' && renderSell()}
         </div>
 
         <div className="bg-gray-300 border-t-2 border-gray-200 px-2 py-1 flex justify-end">

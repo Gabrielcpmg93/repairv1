@@ -23,7 +23,7 @@ const DeliveryMapScreen: React.FC<DeliveryMapScreenProps> = ({ price, onComplete
           {isComplete ? 'Entrega Concluída!' : 'Realizando a Entrega...'}
         </h2>
         
-        <div className="map-container relative w-[600px] h-[375px] bg-gray-800 border-4 border-cyan-800 rounded-lg overflow-hidden">
+        <div className="map-container relative w-[500px] h-[300px] bg-gray-800 border-4 border-cyan-800 rounded-lg overflow-hidden">
           <div className="map-bg"></div>
           <div className="road"></div>
 

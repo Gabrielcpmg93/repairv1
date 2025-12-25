@@ -22,8 +22,8 @@
   font-size: 14px;
 }
 
-.point.start { top: 30px; left: 30px; }
-.point.end { bottom: 30px; right: 30px; }
+.point.start { top: 20px; left: 20px; }
+.point.end { bottom: 20px; right: 20px; }
 
 .ping {
   position: absolute;
@@ -46,18 +46,18 @@
 
 .road {
   position: absolute;
-  top: 41px;
-  left: 82px;
-  width: 465px;
-  height: 285px;
+  top: 32px;
+  left: 65px;
+  width: 390px;
+  height: 230px;
   border: 4px dashed rgba(255, 255, 255, 0.3);
   border-radius: 20px;
 }
 
 .van {
   position: absolute;
-  /* Scaled down path for a 600x375 container */
-  offset-path: path('M40 40 Q 300 350, 560 335');
+  /* Scaled down path for a 500x300 container */
+  offset-path: path('M35 35 Q 250 280, 465 260');
   animation: drive 5s linear forwards;
 }
 

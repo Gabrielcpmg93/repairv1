@@ -71,8 +71,10 @@ export default function App() {
           money={gameLogic.money}
           inventory={gameLogic.inventory}
           repairCount={gameLogic.repairedDevices.length}
+          sellingItems={gameLogic.sellingItems}
           onBuyPart={gameLogic.buyPart}
           onCraftPart={gameLogic.craftPart}
+          onSellPart={gameLogic.sellPart}
           onClose={hideComputer}
         />
       )}
