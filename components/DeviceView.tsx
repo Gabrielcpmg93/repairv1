@@ -22,7 +22,7 @@ const DevicePart3D: React.FC<DevicePart3DProps> = ({ part, onClick, children }) 
   );
 };
 
-// FIX: Added an explicit return type and an exhaustive check to the switch statement. This improves type safety by ensuring the function always returns a well-defined object, which resolves destructuring errors for 'pos' and 'size' on line 92.
+// FIX: Added an explicit return type and an exhaustive check to the switch statement. This improves type safety by ensuring the function always returns a well-defined object, which resolves destructuring errors for 'pos' and 'size'.
 const getPartPositions = (deviceType: 'PHONE' | 'CONSOLE' | 'CONTROLLER'): Record<string, { pos: [number, number, number]; size: [number, number, number] }> => {
     switch (deviceType) {
         case 'PHONE':

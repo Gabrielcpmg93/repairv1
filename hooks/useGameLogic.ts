@@ -80,15 +80,15 @@ export default function useGameLogic() {
         return false;
     }, [money]);
 
-    const checkWinCondition = useCallback(() => {
-        if (!currentDevice || roundCompleted) return;
-        const allAttached = currentDevice.parts.every(p => p.isAttached);
-        const allFixed = currentDevice.parts.every(p => !p.isBroken);
+    const checkWinCondition = useCallback((device: Device) => {
+        if (roundCompleted) return;
+        const allAttached = device.parts.every(p => p.isAttached);
+        const allFixed = device.parts.every(p => !p.isBroken);
 
         if (allAttached && allFixed) {
             setRoundCompleted(true);
         }
-    }, [currentDevice, roundCompleted]);
+    }, [roundCompleted]);
 
     const togglePartAttachment = useCallback((partId: string) => {
         setCurrentDevice(prevDevice => {
@@ -97,8 +97,7 @@ export default function useGameLogic() {
                 p.id === partId ? { ...p, isAttached: !p.isAttached } : p
             );
             const newDevice = { ...prevDevice, parts: newParts };
-            // The win condition is checked immediately after this state update completes.
-            setTimeout(() => checkWinCondition(), 0);
+            checkWinCondition(newDevice);
             return newDevice;
         });
     }, [checkWinCondition]);
@@ -127,7 +126,7 @@ export default function useGameLogic() {
             );
 
             const newDevice = { ...prevDevice, parts: newParts };
-            setTimeout(() => checkWinCondition(), 0);
+            checkWinCondition(newDevice);
             return newDevice;
        });
     }, [inventory, checkWinCondition]);
