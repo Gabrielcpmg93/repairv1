@@ -1,7 +1,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import type { Device, DevicePart, PartType, StoreItem, WorkbenchPart } from '../types';
-import { INITIAL_MONEY } from '../constants';
+import { INITIAL_MONEY, SPONSORSHIP_DEAL } from '../constants';
 import { PartType as PartTypeEnum } from '../types';
 
 const generatePhone = (): Device => {
@@ -105,7 +105,7 @@ export default function useGameLogic() {
     useEffect(() => {
         if (state.sponsorshipActive) {
             const intervalId = setInterval(() => {
-                setState(prevState => ({ ...prevState, money: prevState.money + 500 }));
+                setState(prevState => ({ ...prevState, money: prevState.money + SPONSORSHIP_DEAL.paymentPerSecond }));
             }, 1000);
             return () => clearInterval(intervalId);
         }

@@ -11,6 +11,7 @@ const GradientMaterial = shaderMaterial(
   {
     colorA: new Color('#007cf0'), // Blue
     colorB: new Color('#c039a3'), // Magenta/Pink
+    broken: 0.0, // uniform for broken state
   },
   // Vertex Shader
   `
@@ -25,9 +26,25 @@ const GradientMaterial = shaderMaterial(
     varying vec2 vUv;
     uniform vec3 colorA;
     uniform vec3 colorB;
+    uniform float broken;
+
+    float random(vec2 st) {
+        return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+    }
+
     void main() {
-      // A smooth vertical gradient
-      gl_FragColor = vec4(mix(colorA, colorB, vUv.y * 1.2 - 0.1), 1.0);
+      vec3 finalColor = mix(colorA, colorB, vUv.y * 1.2 - 0.1);
+      if (broken > 0.5) {
+        // Darken the screen and add some noise/lines for a 'broken' effect
+        finalColor *= 0.2;
+        if (random(vUv * 50.0) > 0.98) {
+            finalColor = vec3(0.5);
+        }
+        if (abs(vUv.x - 0.5 + sin(vUv.y * 20.0) * 0.1) < 0.01) {
+            finalColor = vec3(0.1);
+        }
+      }
+      gl_FragColor = vec4(finalColor, 1.0);
     }
   `
 );
@@ -105,10 +122,13 @@ const getPartPositions = (deviceType: DeviceType): Record<string, { pos: [number
 
 
 const PartMeshComponent: React.FC<{ part: DevicePart; size: [number, number, number]; deviceType: DeviceType; }> = ({ part, size, deviceType }) => {
+    const isAttachedAndBroken = part.isBroken && part.isAttached;
+    const isDetachedAndBroken = part.isBroken && !part.isAttached;
+
     const materialProps = {
-        color: part.isBroken && !part.isAttached ? '#ff4d4d' : part.color,
-        transparent: true,
-        opacity: part.isBroken && part.isAttached ? 0.6 : 1.0,
+        color: isDetachedAndBroken ? '#ff4d4d' : part.color,
+        transparent: isAttachedAndBroken,
+        opacity: isAttachedAndBroken ? 0.6 : 1.0,
     };
 
     if (deviceType === 'PHONE') {
@@ -118,7 +138,7 @@ const PartMeshComponent: React.FC<{ part: DevicePart; size: [number, number, num
                     <group>
                         <RoundedBox args={size} radius={0.08}>
                             {/* @ts-ignore */}
-                            <gradientMaterial attach="material" />
+                            <gradientMaterial attach="material" broken={part.isBroken ? 1.0 : 0.0} />
                         </RoundedBox>
                         {/* Notch */}
                         <mesh position={[0, size[1] / 2 - 0.05, 0.015]}>
@@ -131,7 +151,7 @@ const PartMeshComponent: React.FC<{ part: DevicePart; size: [number, number, num
                 return (
                     <group>
                         <RoundedBox args={size} radius={0.1}>
-                            <meshStandardMaterial color="#111" metalness={0.6} roughness={0.3} />
+                            <meshStandardMaterial {...materialProps} metalness={0.6} roughness={0.3} />
                         </RoundedBox>
                         {/* Side Buttons */}
                         <mesh position={[-size[0] / 2 - 0.01, 0.4, 0]}>
