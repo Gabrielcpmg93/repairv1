@@ -10,12 +10,14 @@ interface GameScreenProps {
   currentDevice: Device | null;
   roundCompleted: boolean;
   repairCount: number;
+  craftedDevices: Device[];
   onShowComputer: () => void;
   onShowSponsorships: () => void;
   onShowRepairHistory: () => void;
   togglePartAttachment: (partId: string) => void;
   installNewPart: (partId: string) => void;
   onStartDelivery: () => void;
+  onSelectCraftedDevice: (deviceId: string) => void;
 }
 
 const GameScreen: React.FC<GameScreenProps> = ({
@@ -23,12 +25,14 @@ const GameScreen: React.FC<GameScreenProps> = ({
   workbenchParts,
   currentDevice,
   roundCompleted,
+  craftedDevices,
   onShowComputer,
   onShowSponsorships,
   onShowRepairHistory,
   togglePartAttachment,
   installNewPart,
   onStartDelivery,
+  onSelectCraftedDevice,
 }) => {
   const detachedParts = currentDevice?.parts.filter(p => !p.isAttached) || [];
 
@@ -55,7 +59,7 @@ const GameScreen: React.FC<GameScreenProps> = ({
         {/* Left Panel - Inventory & Detached Parts */}
         <aside className="w-64 bg-gray-800 p-4 overflow-y-auto space-y-4 flex flex-col">
           <div>
-            <h2 className="text-base font-semibold mb-2 border-b-2 border-cyan-500 pb-1">Peças Novas</h2>
+            <h2 className="text-sm font-semibold mb-2 border-b-2 border-cyan-500 pb-1">Peças Novas</h2>
             <div className="space-y-2 mt-2">
               {workbenchParts.length > 0 ? (
                 workbenchParts.map((part) => (
@@ -71,12 +75,12 @@ const GameScreen: React.FC<GameScreenProps> = ({
                   </button>
                 ))
               ) : (
-                <p className="text-sm text-gray-400">Compre peças novas no computador.</p>
+                <p className="text-xs text-gray-400">Compre peças novas no computador.</p>
               )}
             </div>
           </div>
            <div>
-            <h2 className="text-base font-semibold mb-2 border-b-2 border-cyan-500 pb-1">Peças Removidas</h2>
+            <h2 className="text-sm font-semibold mb-2 border-b-2 border-cyan-500 pb-1">Peças Removidas</h2>
              <div className="space-y-2 mt-2">
                 {detachedParts.length > 0 ? (
                     detachedParts.map(part => (
@@ -87,21 +91,40 @@ const GameScreen: React.FC<GameScreenProps> = ({
                             className={`w-full p-2 rounded-md text-left ${part.isBroken ? 'bg-red-800 border border-red-500 cursor-not-allowed' : 'bg-gray-700 hover:bg-cyan-800 transition-colors cursor-pointer'}`}
                         >
                             <p className="font-semibold text-sm">{part.type}</p>
-                            {part.isBroken && <p className="text-xs text-red-300">Quebrada</p>}
+                            {part.isBroken && <p className="text-xs text-red-300 -mt-1">Quebrada</p>}
                         </button>
                     ))
                 ) : (
-                    <p className="text-sm text-gray-400">Nenhuma peça removida.</p>
+                    <p className="text-xs text-gray-400">Nenhuma peça removida.</p>
                 )}
              </div>
           </div>
+          <div>
+            <h2 className="text-sm font-semibold mb-2 border-b-2 border-cyan-500 pb-1">Eletrônicos Criados</h2>
+            <div className="space-y-2 mt-2">
+              {craftedDevices.length > 0 ? (
+                craftedDevices.map((device) => (
+                  <button 
+                    key={device.id} 
+                    onClick={() => onSelectCraftedDevice(device.id)}
+                    className="w-full p-2 rounded-md text-left bg-gray-700 hover:bg-indigo-800 transition-colors cursor-pointer border border-gray-600"
+                  >
+                    <p className="font-semibold text-sm text-indigo-300">{device.name}</p>
+                  </button>
+                ))
+              ) : (
+                <p className="text-xs text-gray-400">Crie eletrônicos no computador.</p>
+              )}
+            </div>
+          </div>
+
           {roundCompleted && (
             <div className="mt-auto pt-4 border-t-2 border-cyan-500 flex flex-col items-center">
                 <h2 className="text-lg font-bold text-green-400 mb-2 text-center animate-pulse">Reparo Concluído!</h2>
-                <p className="text-sm text-center text-gray-300 mb-4">Clique em 'Entregar' para finalizar.</p>
+                <p className="text-xs text-center text-gray-300 mb-3">Clique em 'Entregar' para finalizar.</p>
                 <button 
                     onClick={onStartDelivery} 
-                    className="w-full bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg shadow-green-500/50"
+                    className="w-full bg-green-500 hover:bg-green-400 text-white font-semibold py-1.5 px-3 text-sm rounded-lg transition-transform transform hover:scale-105 shadow-md shadow-green-500/50"
                 >
                     Entregar
                 </button>

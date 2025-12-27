@@ -2,16 +2,17 @@
 import React, { useState, useMemo } from 'react';
 import type { StoreItem, PartType, WorkbenchPart } from '../types';
 import { PARTS_CATALOG } from '../constants';
-import { CloseIcon, CartIcon, HammerIcon, MoneyIcon, TagIcon } from './Icons';
+import { CloseIcon, CartIcon, HammerIcon, MoneyIcon, TagIcon, CubeIcon } from './Icons';
 
 interface ComputerScreenProps {
   money: number;
   workbenchParts: WorkbenchPart[];
   repairCount: number;
   sellingItems: { part: PartType; price: number; id: string }[];
-  onBuyPart: (item: StoreItem) => void;
-  onCraftPart: (item: StoreItem) => void;
+  onBuyPart: (item: StoreItem) => boolean;
+  onCraftPart: (item: StoreItem) => boolean;
   onSellPart: (part: PartType, price: number) => void;
+  onCraftDevice: () => boolean;
   onClose: () => void;
 }
 
@@ -43,8 +44,8 @@ const PartImage: React.FC<{image: string}> = ({ image }) => {
     return <div className={`w-12 h-12 ${colorClass} rounded-md border-2 border-gray-400`}></div>;
 }
 
-const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, workbenchParts, repairCount, sellingItems, onBuyPart, onCraftPart, onSellPart, onClose }) => {
-  const [view, setView] = useState<'store' | 'crafting' | 'sell'>('store');
+const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, workbenchParts, repairCount, sellingItems, onBuyPart, onCraftPart, onSellPart, onCraftDevice, onClose }) => {
+  const [view, setView] = useState<'store' | 'crafting' | 'sell' | 'create'>('store');
   const [sellPrices, setSellPrices] = useState<Partial<Record<PartType, number>>>({});
 
   const isCraftingUnlocked = repairCount >= CRAFTING_UNLOCK_COUNT;
@@ -58,19 +59,15 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, workbenchParts, 
     }, {} as Record<PartType, number>);
   }, [workbenchParts]);
 
-  // FIX: Moved useMemo to the top level to respect the Rules of Hooks.
-  // This was previously inside renderSell(), causing a conditional hook call.
   const sellableItems = useMemo(() => {
     return (Object.keys(inventoryCounts) as PartType[])
         .map(partType => {
             return {
                 partType,
                 count: inventoryCounts[partType],
-                // This links inventory data with catalog data safely.
                 storeItem: PARTS_CATALOG.find(p => p.id === partType),
             };
         })
-        // This filter is the definitive bug fix: it ensures we only try to render items that exist in the catalog.
         .filter(item => item.storeItem && item.count > 0);
   }, [inventoryCounts]);
 
@@ -174,7 +171,6 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, workbenchParts, 
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sellableItems.map(({ partType, count, storeItem }) => {
-                    // Thanks to the filter above, 'storeItem' is guaranteed to exist here.
                     if (!storeItem) return null; 
 
                     const price = sellPrices[partType] || Math.floor(storeItem.price * 0.5);
@@ -214,6 +210,25 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, workbenchParts, 
     );
   }
 
+  const renderCreateDevice = () => (
+    <div className="text-black h-full flex flex-col items-center justify-center p-8 bg-gray-100">
+        <CubeIcon className="w-24 h-24 mx-auto text-cyan-600 mb-4"/>
+        <h3 className="text-3xl font-bold mb-2 text-gray-800">Criar Eletrônico 3D Realista</h3>
+        <p className="text-gray-600 mb-6 max-w-md text-center">Use seu conhecimento técnico para montar um novo dispositivo do zero. Ele será adicionado à sua bancada.</p>
+        
+        <div className="bg-white p-4 rounded-lg border-2 border-gray-300 inline-block my-4 shadow-inner">
+            <p className="text-lg">Custo de Criação: <span className="font-bold text-red-600">R$ 50</span></p>
+        </div>
+        
+        <button
+            onClick={onCraftDevice}
+            className="mt-6 bg-cyan-500 text-white font-bold py-3 px-10 rounded-md border-2 border-b-cyan-700 border-r-cyan-700 border-t-cyan-400 border-l-cyan-400 hover:bg-cyan-600 active:border-t-cyan-700 active:border-l-cyan-700 transition-all text-lg"
+        >
+            Iniciar Criação
+        </button>
+    </div>
+);
+
 
   return (
     <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
@@ -248,6 +263,10 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, workbenchParts, 
                 <TagIcon className="w-5 h-5 inline-block mr-2"/>
                 Vender Peças
             </button>
+            <button onClick={() => setView('create')} className={`font-bold px-3 py-1 border-2 text-black ${view === 'create' ? 'bg-gray-100 border-b-gray-100' : 'bg-gray-300 hover:bg-gray-100'}`}>
+                <CubeIcon className="w-5 h-5 inline-block mr-2"/>
+                Criar
+            </button>
             <div className="flex-grow"></div>
             <div className="flex items-center bg-black text-white px-2 py-0.5 rounded-sm">
                  <MoneyIcon className="w-5 h-5 mr-2"/>
@@ -260,6 +279,7 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, workbenchParts, 
                 {view === 'store' && 'www.packuten.co.jp'}
                 {view === 'crafting' && 'local://workbench/crafting'}
                 {view === 'sell' && 'local://marketplace/sell'}
+                {view === 'create' && 'local://foundry/create'}
             </p>
         </div>
 
@@ -267,6 +287,7 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, workbenchParts, 
             {view === 'store' && renderStore()}
             {view === 'crafting' && renderCrafting()}
             {view === 'sell' && renderSell()}
+            {view === 'create' && renderCreateDevice()}
         </div>
 
         <div className="bg-gray-300 border-t-2 border-gray-200 px-2 py-1 flex justify-end">

@@ -63,6 +63,7 @@ export default function App() {
           onShowSponsorships={showSponsorships}
           onShowRepairHistory={showRepairHistory}
           onStartDelivery={handleStartDelivery}
+          onSelectCraftedDevice={gameLogic.selectCraftedDevice}
         />
       )}
       
@@ -75,6 +76,7 @@ export default function App() {
           onBuyPart={gameLogic.buyPart}
           onCraftPart={gameLogic.craftPart}
           onSellPart={gameLogic.sellPart}
+          onCraftDevice={gameLogic.craftDevice}
           onClose={hideComputer}
         />
       )}

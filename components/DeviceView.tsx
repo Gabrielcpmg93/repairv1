@@ -73,14 +73,13 @@ const DevicePart3D: React.FC<DevicePart3DProps> = ({ part, onClick, children }) 
 const getPartPositions = (deviceType: DeviceType): Record<string, { pos: [number, number, number]; size: [number, number, number] }> => {
     switch (deviceType) {
         case 'PHONE':
-            // FIX: Adjusted Z-positions to prevent visual clipping/Z-fighting.
-            // Parts are layered correctly from front to back.
             return {
-                [PartType.SCREEN]: { pos: [0, 0, 0.035], size: [0.95, 2, 0.02] }, // Front-most
-                [PartType.MOTHERBOARD]: { pos: [0, 0, 0], size: [0.9, 1.8, 0.05] }, // Center
-                [PartType.BATTERY]: { pos: [0, 0.2, -0.075], size: [0.7, 1.2, 0.1] }, // Behind motherboard
-                [PartType.CAMERA]: { pos: [0.25, 0.75, -0.05], size: [0.2, 0.2, 0.05] }, // Behind motherboard
-                [PartType.BACK_COVER]: { pos: [0, 0, -0.175], size: [1, 2.05, 0.1] }, // Back-most
+                [PartType.SCREEN]: { pos: [0, 0, 0.035], size: [0.95, 2, 0.02] },
+                [PartType.MOTHERBOARD]: { pos: [0, 0, 0], size: [0.9, 1.8, 0.05] },
+                // FIX: Camera moved slightly back to prevent Z-fighting with motherboard.
+                [PartType.CAMERA]: { pos: [0.25, 0.75, -0.026], size: [0.2, 0.2, 0.05] },
+                [PartType.BATTERY]: { pos: [0, 0.2, -0.075], size: [0.7, 1.2, 0.1] },
+                [PartType.BACK_COVER]: { pos: [0, 0, -0.175], size: [1, 2.05, 0.1] },
             };
         case 'CONSOLE':
             return {
@@ -229,8 +228,8 @@ const PartMeshComponent: React.FC<{ part: DevicePart; size: [number, number, num
                            <meshStandardMaterial {...materialProps} />
                         </RoundedBox>
 
-                        {/* D-Pad */}
-                        <group position={[-0.55, size[1]/2 + 0.01, 0]}>
+                        {/* D-Pad - FIX: Lifted slightly on Y-axis to prevent Z-fighting */}
+                        <group position={[-0.55, size[1]/2 + 0.02, 0]}>
                             <mesh position={[0,0,0.01]}>
                                 <boxGeometry args={[0.35, 0.12, 0.1]} />
                                 <meshStandardMaterial color="#4A5568" />
@@ -241,8 +240,8 @@ const PartMeshComponent: React.FC<{ part: DevicePart; size: [number, number, num
                             </mesh>
                         </group>
 
-                        {/* Face Buttons */}
-                         <group position={[0.55, size[1]/2, 0]}>
+                        {/* Face Buttons - FIX: Lifted slightly on Y-axis to prevent Z-fighting */}
+                         <group position={[0.55, size[1]/2 + 0.01, 0]}>
                             <mesh position={[-0.08, 0.01, 0.1]}>
                                <cylinderGeometry args={[0.07, 0.07, 0.1, 16]} />
                                <meshStandardMaterial color="#b39ddb" />
@@ -261,8 +260,8 @@ const PartMeshComponent: React.FC<{ part: DevicePart; size: [number, number, num
                             </mesh>
                         </group>
 
-                        {/* Select/Start */}
-                         <group position={[0, size[1]/2 + 0.01, 0]}>
+                        {/* Select/Start - FIX: Lifted slightly on Y-axis to prevent Z-fighting */}
+                         <group position={[0, size[1]/2 + 0.02, 0]}>
                             <mesh rotation={[0, 0, 0.2]} position={[-0.15, 0, 0]}>
                                 <capsuleGeometry args={[0.04, 0.15, 4, 8]} />
                                 <meshStandardMaterial color="#718096" />

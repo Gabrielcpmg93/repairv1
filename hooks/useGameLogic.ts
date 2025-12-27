@@ -87,6 +87,7 @@ interface GameLogicState {
     roundCompleted: boolean;
     sponsorshipActive: boolean;
     sellingItems: { part: PartType; price: number; id: string }[];
+    craftedDevices: Device[];
 }
 
 const initialState: GameLogicState = {
@@ -97,6 +98,7 @@ const initialState: GameLogicState = {
     roundCompleted: false,
     sponsorshipActive: false,
     sellingItems: [],
+    craftedDevices: [],
 };
 
 export default function useGameLogic() {
@@ -135,45 +137,37 @@ export default function useGameLogic() {
     }, []);
     
     const buyPart = useCallback((item: StoreItem) => {
-        let success = false;
-        setState(prevState => {
-            if (prevState.money >= item.price) {
-                success = true;
-                const newPart: WorkbenchPart = { id: `new-${item.id}-${Date.now()}`, type: item.id };
-                return {
-                    ...prevState,
-                    money: prevState.money - item.price,
-                    workbenchParts: [...prevState.workbenchParts, newPart],
-                };
-            }
-            return prevState;
-        });
-        if (!success) {
+        if (state.money < item.price) {
             alert("Dinheiro insuficiente!");
+            return false;
         }
-        return success;
-    }, []);
+        setState(prevState => {
+            const newPart: WorkbenchPart = { id: `new-${item.id}-${Date.now()}`, type: item.id };
+            return {
+                ...prevState,
+                money: prevState.money - item.price,
+                workbenchParts: [...prevState.workbenchParts, newPart],
+            };
+        });
+        return true;
+    }, [state.money]);
 
     const craftPart = useCallback((item: StoreItem) => {
         const craftingCost = Math.floor(item.price * 0.75);
-        let success = false;
-        setState(prevState => {
-            if (prevState.money >= craftingCost) {
-                success = true;
-                 const newPart: WorkbenchPart = { id: `new-${item.id}-${Date.now()}`, type: item.id };
-                return {
-                    ...prevState,
-                    money: prevState.money - craftingCost,
-                    workbenchParts: [...prevState.workbenchParts, newPart],
-                };
-            }
-            return prevState;
-        });
-        if (!success) {
+        if (state.money < craftingCost) {
             alert("Dinheiro insuficiente para criar esta peça!");
+            return false;
         }
-        return success;
-    }, []);
+        setState(prevState => {
+            const newPart: WorkbenchPart = { id: `new-${item.id}-${Date.now()}`, type: item.id };
+            return {
+                ...prevState,
+                money: prevState.money - craftingCost,
+                workbenchParts: [...prevState.workbenchParts, newPart],
+            };
+        });
+        return true;
+    }, [state.money]);
 
     const sellPart = useCallback((partType: PartType, price: number) => {
         if (!partType || price <= 0) {
@@ -265,6 +259,50 @@ export default function useGameLogic() {
             return { ...prevState, sponsorshipActive: true };
         });
     }, []);
+    
+    const craftDevice = useCallback(() => {
+        const CRAFTING_COST = 50;
+        if (state.money < CRAFTING_COST) {
+            alert("Dinheiro insuficiente para criar um eletrônico!");
+            return false;
+        }
+
+        setState(prevState => {
+            const randomGenerator = deviceGenerators[Math.floor(Math.random() * deviceGenerators.length)];
+            const newDevice = randomGenerator();
+            // Prefix name to identify it as crafted
+            newDevice.name = `(Criado) ${newDevice.name}`;
+            return {
+                ...prevState,
+                money: prevState.money - CRAFTING_COST,
+                craftedDevices: [...prevState.craftedDevices, newDevice],
+            };
+        });
+        alert("Eletrônico criado com sucesso e adicionado à sua bancada!");
+        return true;
+    }, [state.money]);
+    
+    const selectCraftedDevice = useCallback((deviceId: string) => {
+        setState(prevState => {
+            const { currentDevice, craftedDevices } = prevState;
+            if (!currentDevice) return prevState;
+
+            const deviceToSelect = craftedDevices.find(d => d.id === deviceId);
+            if (!deviceToSelect) return prevState;
+
+            // Remove selected device from crafted list and add the current device in its place
+            const newCraftedList = craftedDevices.filter(d => d.id !== deviceId);
+            newCraftedList.push(currentDevice);
+
+            return {
+                ...prevState,
+                currentDevice: deviceToSelect,
+                craftedDevices: newCraftedList,
+                roundCompleted: checkWinCondition(deviceToSelect),
+            };
+        });
+    }, []);
+
 
     return {
         ...state,
@@ -276,5 +314,7 @@ export default function useGameLogic() {
         togglePartAttachment,
         installNewPart,
         signSponsorship,
+        craftDevice,
+        selectCraftedDevice,
     };
 }

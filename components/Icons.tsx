@@ -49,3 +49,9 @@ export const TagIcon: React.FC<{ className?: string }> = ({ className }) => (
         <path d="M12.9 2.6L2.6 12.9c-.6.6-.6 1.5 0 2.1l6.4 6.4c.6.6 1.5.6 2.1 0l10.3-10.3V4c0-.8-.7-1.5-1.5-1.5h-7zm-1.9 8.4c-.8.8-2.1.8-2.8 0-.8-.8-.8-2.1 0-2.8.8-.8 2.1-.8 2.8 0 .8.8.8 2.1 0 2.8z"/>
     </svg>
 );
+
+export const CubeIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12,2L2,7V17L12,22L22,17V7L12,2M11,11H4.5L8,9.25V4.5L11,6.25V11M13,11V6.25L16,4.5V9.25L19.5,11H13M11,13V17.75L8,19.5V14.75L4.5,13H11M13,13H19.5L16,14.75V19.5L13,17.75V13Z" />
+  </svg>
+);
