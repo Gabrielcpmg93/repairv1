@@ -69,15 +69,56 @@ const generateTelevision = (): Device => {
     return { id: `television-${Date.now()}`, name: 'TV de LED Panaview', type: 'TELEVISION', parts };
 };
 
+const generateBicycle = (): Device => {
+    const parts: DevicePart[] = [
+        { id: 'b1', type: PartTypeEnum.BIKE_FRAME, isBroken: false, isAttached: true, color: '#3b82f6' },
+        { id: 'b2', type: PartTypeEnum.WHEEL, isBroken: false, isAttached: true, color: '#1f2937' },
+        { id: 'b3', type: PartTypeEnum.CHAIN, isBroken: false, isAttached: true, color: '#6b7280' },
+        { id: 'b4', type: PartTypeEnum.PEDALS, isBroken: false, isAttached: true, color: '#4b5563' },
+        { id: 'b5', type: PartTypeEnum.HANDLEBARS, isBroken: false, isAttached: true, color: '#9ca3af' },
+    ];
+    const partToBreakIndex = Math.floor(Math.random() * parts.length);
+    parts[partToBreakIndex].isBroken = true;
+    return { id: `bicycle-${Date.now()}`, name: 'Bicicleta Veloz', type: 'BICYCLE', parts };
+};
+
+const generateRouter = (): Device => {
+    const parts: DevicePart[] = [
+        { id: 'rt1', type: PartTypeEnum.ROUTER_CASING, isBroken: false, isAttached: true, color: '#e5e7eb' },
+        { id: 'rt2', type: PartTypeEnum.ROUTER_MAINBOARD, isBroken: false, isAttached: true, color: '#16a34a' },
+        { id: 'rt3', type: PartTypeEnum.ROUTER_ANTENNA, isBroken: false, isAttached: true, color: '#111827' },
+        { id: 'rt4', type: PartTypeEnum.ROUTER_PSU, isBroken: false, isAttached: true, color: '#4b5563' },
+    ];
+    const partToBreakIndex = Math.floor(Math.random() * parts.length);
+    parts[partToBreakIndex].isBroken = true;
+    return { id: `router-${Date.now()}`, name: 'Roteador ConnectNet', type: 'ROUTER', parts };
+};
+
+const generateCar = (): Device => {
+    const parts: DevicePart[] = [
+        { id: 'car1', type: PartTypeEnum.CAR_CHASSIS, isBroken: false, isAttached: true, color: '#ef4444' },
+        { id: 'car2', type: PartTypeEnum.ENGINE, isBroken: false, isAttached: true, color: '#4b5563' },
+        { id: 'car3', type: PartTypeEnum.CAR_WHEEL, isBroken: false, isAttached: true, color: '#1f2937' },
+        { id: 'car4', type: PartTypeEnum.STEERING_WHEEL, isBroken: false, isAttached: true, color: '#111827' },
+        { id: 'car5', type: PartTypeEnum.CAR_BATTERY, isBroken: false, isAttached: true, color: '#6b7280' },
+    ];
+    const partToBreakIndex = Math.floor(Math.random() * parts.length);
+    parts[partToBreakIndex].isBroken = true;
+    return { id: `car-${Date.now()}`, name: 'Carro Esportivo', type: 'CAR', parts };
+};
+
 const deviceGenerators: Record<DeviceType, () => Device> = {
     PHONE: generatePhone,
     CONSOLE: generateConsole,
     CONTROLLER: generateController,
     RADIO: generateRadio,
     TELEVISION: generateTelevision,
+    BICYCLE: generateBicycle,
+    ROUTER: generateRouter,
+    CAR: generateCar,
 };
 
-const allDeviceGenerators = [generatePhone, generateConsole, generateController, generateRadio, generateTelevision];
+const allDeviceGenerators = Object.values(deviceGenerators);
 
 const checkWinCondition = (device: Device | null): boolean => {
     if (!device) return false;

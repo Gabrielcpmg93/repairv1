@@ -46,4 +46,24 @@ export const PARTS_CATALOG: StoreItem[] = [
   { id: PartType.TV_MAINBOARD, name: "Placa Principal de TV", price: 900, brand: "Panaview", image: "dark-green" },
   { id: PartType.TV_PSU, name: "Fonte de Alimentação de TV", price: 750, brand: "Voltz", image: "gray" },
   { id: PartType.T_CON_BOARD, name: "Placa T-Con (Controladora)", price: 450, brand: "Panaview", image: "green" },
+
+  // Bicycle Parts
+  { id: PartType.BIKE_FRAME, name: "Quadro de Bicicleta", price: 1200, brand: "PedalMaster", image: "blue" },
+  { id: PartType.WHEEL, name: "Roda com Pneu", price: 350, brand: "PedalMaster", image: "black" },
+  { id: PartType.CHAIN, name: "Corrente", price: 150, brand: "GearShift", image: "gray" },
+  { id: PartType.PEDALS, name: "Par de Pedais", price: 120, brand: "PedalMaster", image: "dark-gray" },
+  { id: PartType.HANDLEBARS, name: "Guidão", price: 200, brand: "PedalMaster", image: "gray" },
+
+  // Router Parts
+  { id: PartType.ROUTER_CASING, name: "Carcaça de Roteador", price: 150, brand: "ConnectNet", image: "white" },
+  { id: PartType.ROUTER_MAINBOARD, name: "Placa Principal de Roteador", price: 450, brand: "ConnectNet", image: "green" },
+  { id: PartType.ROUTER_ANTENNA, name: "Antena Wi-Fi", price: 80, brand: "SignalMax", image: "black" },
+  { id: PartType.ROUTER_PSU, name: "Fonte de Roteador", price: 120, brand: "Voltz", image: "dark-gray" },
+
+  // Car Parts
+  { id: PartType.CAR_CHASSIS, name: "Chassi de Carro", price: 3500, brand: "AutoForm", image: "red" },
+  { id: PartType.ENGINE, name: "Motor V4", price: 5000, brand: "AutoForm", image: "dark-gray" },
+  { id: PartType.CAR_WHEEL, name: "Roda de Carro", price: 600, brand: "GripTire", image: "black" },
+  { id: PartType.STEERING_WHEEL, name: "Volante", price: 400, brand: "AutoForm", image: "black" },
+  { id: PartType.CAR_BATTERY, name: "Bateria de Carro", price: 700, brand: "Voltz", image: "gray" },
 ];

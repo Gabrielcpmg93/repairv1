@@ -85,3 +85,21 @@ export const TvIcon: React.FC<{ className?: string }> = ({ className }) => (
     <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/>
   </svg>
 );
+
+export const BicycleIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2c-3.03 0-5.5 2.47-5.5 5.5S8.97 13 12 13s5.5-2.47 5.5-5.5S15.03 2 12 2zm0 9c-1.93 0-3.5-1.57-3.5-3.5S10.07 4 12 4s3.5 1.57 3.5 3.5S13.93 11 12 11zm-8 4h16v2H4v-2zm8 1c-2.76 0-5 2.24-5 5h10c0-2.76-2.24-5-5-5zm0 8c-1.66 0-3-1.34-3-3h6c0 1.66-1.34 3-3 3z"/>
+    </svg>
+);
+
+export const RouterIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20.41 10.41l-2.83-2.83A1 1 0 0016.17 8H7.83a1 1 0 00-.71.29L4.59 10.41A2 2 0 004 11.83V16h16v-4.17a2 2 0 00-.59-1.42zM7 14v-2h10v2H7zm-2-4l2-2h8l2 2H5zM2 17h20v2H2v-2z"/>
+    </svg>
+);
+
+export const CarIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+    </svg>
+);

@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import type { StoreItem, PartType, WorkbenchPart, DeviceType } from '../types';
 import { PARTS_CATALOG } from '../constants';
-import { CloseIcon, CartIcon, HammerIcon, MoneyIcon, TagIcon, CubeIcon, PhoneIcon, ConsoleIcon, ControllerIcon, RadioIcon, TvIcon } from './Icons';
+import { CloseIcon, CartIcon, HammerIcon, MoneyIcon, TagIcon, CubeIcon, PhoneIcon, ConsoleIcon, ControllerIcon, RadioIcon, TvIcon, BicycleIcon, RouterIcon, CarIcon } from './Icons';
 
 interface ComputerScreenProps {
   money: number;
@@ -25,6 +25,9 @@ const CREATABLE_DEVICES = [
     { type: 'CONTROLLER' as DeviceType, name: 'Super Retro Pad', icon: ControllerIcon },
     { type: 'RADIO' as DeviceType, name: 'Rádio Transistor Vintage', icon: RadioIcon },
     { type: 'TELEVISION' as DeviceType, name: 'TV de LED Panaview', icon: TvIcon },
+    { type: 'BICYCLE' as DeviceType, name: 'Bicicleta Veloz', icon: BicycleIcon },
+    { type: 'ROUTER' as DeviceType, name: 'Roteador ConnectNet', icon: RouterIcon },
+    { type: 'CAR' as DeviceType, name: 'Carro Esportivo', icon: CarIcon },
 ];
 
 const PartImage: React.FC<{image: string}> = ({ image }) => {
@@ -38,6 +41,8 @@ const PartImage: React.FC<{image: string}> = ({ image }) => {
     if(image === 'purple') colorClass = 'bg-purple-600';
     if(image === 'white') colorClass = 'bg-gray-100';
     if(image === 'brown') colorClass = 'bg-yellow-800';
+    if(image === 'red') colorClass = 'bg-red-500';
+
 
     if (image === 'multi-color') {
         return (
@@ -225,7 +230,7 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, workbenchParts, 
             <h3 className="text-2xl font-bold text-gray-800">Oficina de Criação</h3>
             <p className="text-gray-600">Escolha um projeto para montar um novo dispositivo do zero.</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {CREATABLE_DEVICES.map(device => {
                 const Icon = device.icon;
                 return (
@@ -249,7 +254,7 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, workbenchParts, 
 
   return (
     <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-      <div className="w-[800px] h-[600px] bg-gray-300 rounded-lg shadow-2xl flex flex-col overflow-hidden border-4 border-t-gray-100 border-l-gray-100 border-r-gray-500 border-b-gray-500">
+      <div className="w-[900px] h-[600px] bg-gray-300 rounded-lg shadow-2xl flex flex-col overflow-hidden border-4 border-t-gray-100 border-l-gray-100 border-r-gray-500 border-b-gray-500">
         
         <div className="bg-blue-800 text-white flex justify-between items-center p-1 pl-3 select-none">
           <h2 className="font-bold">GOZILLA FAIRFOX</h2>

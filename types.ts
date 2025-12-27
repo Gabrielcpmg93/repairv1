@@ -1,6 +1,6 @@
 
 export type GameState = 'MENU' | 'PLAYING' | 'COMPUTER' | 'SETTING_PRICE' | 'DELIVERING' | 'SPONSORSHIP' | 'REPAIR_HISTORY';
-export type DeviceType = 'PHONE' | 'CONSOLE' | 'CONTROLLER' | 'RADIO' | 'TELEVISION';
+export type DeviceType = 'PHONE' | 'CONSOLE' | 'CONTROLLER' | 'RADIO' | 'TELEVISION' | 'BICYCLE' | 'ROUTER' | 'CAR';
 
 export enum PartType {
   // Phone Parts
@@ -37,6 +37,26 @@ export enum PartType {
   TV_PSU = 'Fonte de TV',
   T_CON_BOARD = 'Placa T-Con',
   TV_CASING = 'Carcaça de TV',
+
+  // Bicycle Parts
+  BIKE_FRAME = 'Quadro de Bicicleta',
+  WHEEL = 'Roda de Bicicleta',
+  CHAIN = 'Corrente',
+  PEDALS = 'Pedais',
+  HANDLEBARS = 'Guidão',
+
+  // Router Parts
+  ROUTER_CASING = 'Carcaça do Roteador',
+  ROUTER_MAINBOARD = 'Placa Principal do Roteador',
+  ROUTER_ANTENNA = 'Antena do Roteador',
+  ROUTER_PSU = 'Fonte do Roteador',
+
+  // Car Parts
+  CAR_CHASSIS = 'Chassi do Carro',
+  ENGINE = 'Motor',
+  CAR_WHEEL = 'Roda de Carro',
+  STEERING_WHEEL = 'Volante',
+  CAR_BATTERY = 'Bateria de Carro',
 }
 
 export interface DevicePart {
@@ -48,7 +68,7 @@ export interface DevicePart {
 }
 
 export interface WorkbenchPart {
-  id: string;
+  id:string;
   type: PartType;
 }
 

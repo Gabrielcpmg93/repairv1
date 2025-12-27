@@ -45,6 +45,31 @@ const RetroDeviceImage: React.FC<{type: DeviceType}> = ({ type }) => {
                 <div className="w-8 h-1 bg-gray-600 mt-1"></div>
             </div>
         )
+    } else if (type === 'BICYCLE') {
+        return (
+            <div className="w-24 h-16 flex items-center justify-center mx-auto">
+                <div className="w-8 h-8 rounded-full border-2 border-gray-500"></div>
+                <div className="w-8 h-8 rounded-full border-2 border-gray-500 -ml-2"></div>
+            </div>
+        )
+    } else if (type === 'ROUTER') {
+        return (
+            <div className="w-24 h-16 bg-gray-200 border-2 border-gray-400 rounded-md mx-auto relative p-1">
+                <div className="w-1 h-8 bg-gray-800 absolute top-0 left-4"></div>
+                <div className="w-1 h-8 bg-gray-800 absolute top-0 right-4"></div>
+                <div className="w-full h-4 bg-gray-700 absolute bottom-0 left-0"></div>
+            </div>
+        )
+    } else if (type === 'CAR') {
+        return (
+            <div className="w-24 h-16 flex flex-col justify-center items-center mx-auto">
+                <div className="w-20 h-8 bg-red-600 rounded-t-lg border-2 border-red-800"></div>
+                <div className="flex justify-between w-24">
+                    <div className="w-4 h-4 bg-black rounded-full"></div>
+                    <div className="w-4 h-4 bg-black rounded-full"></div>
+                </div>
+            </div>
+        )
     }
     return null;
 }
