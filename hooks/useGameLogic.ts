@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import type { Device, DevicePart, PartType, StoreItem, WorkbenchPart } from '../types';
+import type { Device, DevicePart, PartType, StoreItem, WorkbenchPart, DeviceType } from '../types';
 import { INITIAL_MONEY, SPONSORSHIP_DEAL } from '../constants';
 import { PartType as PartTypeEnum } from '../types';
 
@@ -69,7 +69,15 @@ const generateTelevision = (): Device => {
     return { id: `television-${Date.now()}`, name: 'TV de LED Panaview', type: 'TELEVISION', parts };
 };
 
-const deviceGenerators = [generatePhone, generateConsole, generateController, generateRadio, generateTelevision];
+const deviceGenerators: Record<DeviceType, () => Device> = {
+    PHONE: generatePhone,
+    CONSOLE: generateConsole,
+    CONTROLLER: generateController,
+    RADIO: generateRadio,
+    TELEVISION: generateTelevision,
+};
+
+const allDeviceGenerators = [generatePhone, generateConsole, generateController, generateRadio, generateTelevision];
 
 const checkWinCondition = (device: Device | null): boolean => {
     if (!device) return false;
@@ -114,7 +122,7 @@ export default function useGameLogic() {
     }, [state.sponsorshipActive]);
 
     const startNewRound = useCallback(() => {
-        const randomGenerator = deviceGenerators[Math.floor(Math.random() * deviceGenerators.length)];
+        const randomGenerator = allDeviceGenerators[Math.floor(Math.random() * allDeviceGenerators.length)];
         setState(prevState => ({
             ...prevState,
             currentDevice: randomGenerator(),
@@ -123,7 +131,7 @@ export default function useGameLogic() {
     }, []);
 
     const collectPaymentAndStartNewRound = useCallback((price: number) => {
-        const randomGenerator = deviceGenerators[Math.floor(Math.random() * deviceGenerators.length)];
+        const randomGenerator = allDeviceGenerators[Math.floor(Math.random() * allDeviceGenerators.length)];
         setState(prevState => {
             if (!prevState.currentDevice) return prevState;
             return {
@@ -260,16 +268,21 @@ export default function useGameLogic() {
         });
     }, []);
     
-    const craftDevice = useCallback(() => {
+    const craftDevice = useCallback((deviceType: DeviceType) => {
         const CRAFTING_COST = 50;
         if (state.money < CRAFTING_COST) {
             alert("Dinheiro insuficiente para criar um eletrônico!");
             return false;
         }
 
+        const generator = deviceGenerators[deviceType];
+        if (!generator) {
+            console.error(`Nenhum gerador encontrado para o tipo de dispositivo: ${deviceType}`);
+            return false;
+        }
+
         setState(prevState => {
-            const randomGenerator = deviceGenerators[Math.floor(Math.random() * deviceGenerators.length)];
-            const newDevice = randomGenerator();
+            const newDevice = generator();
             // Prefix name to identify it as crafted
             newDevice.name = `(Criado) ${newDevice.name}`;
             return {

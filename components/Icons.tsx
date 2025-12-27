@@ -16,7 +16,7 @@ export const WrenchIcon: React.FC<{ className?: string }> = ({ className }) => (
 export const MoneyIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
         <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM6.5 10a.5.5 0 01.5-.5h2V9a.5.5 0 011 0v.5h.5a.5.5 0 010 1H10v.5a.5.5 0 01-1 0V11H7a.5.5 0 01-.5-.5z" />
-        <path d="M10.155 5.862a.5.5 0 01.99 0V6a.5.5 0 01-1 0V5.862zM10 14a.5.5 0 01-.5-.5V13a.5.5 0 011 0v.5a.5.5 0 01-.5.5z" />
+        <path d="M10.155 5.862a.5.5 0 01.99 0V6a.5.5 0 01-1 0V5.862zM10 14a.5.5 0 01-.5-.5V13a.5.5 0 011 0v.5a.5.5 0 01-.5-.5z" />
     </svg>
 );
 
@@ -53,5 +53,35 @@ export const TagIcon: React.FC<{ className?: string }> = ({ className }) => (
 export const CubeIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
     <path d="M12,2L2,7V17L12,22L22,17V7L12,2M11,11H4.5L8,9.25V4.5L11,6.25V11M13,11V6.25L16,4.5V9.25L19.5,11H13M11,13V17.75L8,19.5V14.75L4.5,13H11M13,13H19.5L16,14.75V19.5L13,17.75V13Z" />
+  </svg>
+);
+
+export const PhoneIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
+  </svg>
+);
+
+export const ConsoleIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M21 4H3C1.9 4 1 4.9 1 6v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-12 13H5v-2h4v2zm0-3H5v-2h4v2zm0-3H5V9h4v2zm5 6h-4v-2h4v2zm0-3h-4v-2h4v2zm0-3h-4V9h4v2zm5 6h-4v-2h4v2zm0-3h-4v-2h4v2zm0-3h-4V9h4v2z"/>
+  </svg>
+);
+
+export const ControllerIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M21.58 16.09l-1.17-1.17c-.78-.78-.78-2.05 0-2.83l1.17-1.17c.78-.78.78-2.05 0-2.83l-1.17-1.17a2.004 2.004 0 00-2.83 0l-1.17 1.17a2.004 2.004 0 000 2.83l1.17 1.17c.78.78.78 2.05 0 2.83l-1.17 1.17a2.004 2.004 0 000 2.83l1.17 1.17c.78.78 2.05.78 2.83 0l1.17-1.17c.78-.78.78-2.05 0-2.83zM4.5 12.5h5v-1h-5v1zM6.5 15h1v-5h-1v5z"/>
+  </svg>
+);
+
+export const RadioIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 18V6h11v12H4zm14 0h-2v-2h2v2zm0-3h-2v-2h2v2zm0-3h-2V9h2v2zm0-3h-2V6h2v2z"/>
+  </svg>
+);
+
+export const TvIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/>
   </svg>
 );

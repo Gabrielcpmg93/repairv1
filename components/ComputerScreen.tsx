@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
-import type { StoreItem, PartType, WorkbenchPart } from '../types';
+import type { StoreItem, PartType, WorkbenchPart, DeviceType } from '../types';
 import { PARTS_CATALOG } from '../constants';
-import { CloseIcon, CartIcon, HammerIcon, MoneyIcon, TagIcon, CubeIcon } from './Icons';
+import { CloseIcon, CartIcon, HammerIcon, MoneyIcon, TagIcon, CubeIcon, PhoneIcon, ConsoleIcon, ControllerIcon, RadioIcon, TvIcon } from './Icons';
 
 interface ComputerScreenProps {
   money: number;
@@ -12,11 +12,20 @@ interface ComputerScreenProps {
   onBuyPart: (item: StoreItem) => boolean;
   onCraftPart: (item: StoreItem) => boolean;
   onSellPart: (part: PartType, price: number) => void;
-  onCraftDevice: () => boolean;
+  onCraftDevice: (deviceType: DeviceType) => boolean;
   onClose: () => void;
 }
 
 const CRAFTING_UNLOCK_COUNT = 3;
+const CRAFTING_COST = 50;
+
+const CREATABLE_DEVICES = [
+    { type: 'PHONE' as DeviceType, name: 'Gozilla Fone 3D', icon: PhoneIcon },
+    { type: 'CONSOLE' as DeviceType, name: 'Super Retro Console', icon: ConsoleIcon },
+    { type: 'CONTROLLER' as DeviceType, name: 'Super Retro Pad', icon: ControllerIcon },
+    { type: 'RADIO' as DeviceType, name: 'Rádio Transistor Vintage', icon: RadioIcon },
+    { type: 'TELEVISION' as DeviceType, name: 'TV de LED Panaview', icon: TvIcon },
+];
 
 const PartImage: React.FC<{image: string}> = ({ image }) => {
     let colorClass = 'bg-gray-500';
@@ -211,21 +220,29 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({ money, workbenchParts, 
   }
 
   const renderCreateDevice = () => (
-    <div className="text-black h-full flex flex-col items-center justify-center p-8 bg-gray-100">
-        <CubeIcon className="w-24 h-24 mx-auto text-cyan-600 mb-4"/>
-        <h3 className="text-3xl font-bold mb-2 text-gray-800">Criar Eletrônico 3D Realista</h3>
-        <p className="text-gray-600 mb-6 max-w-md text-center">Use seu conhecimento técnico para montar um novo dispositivo do zero. Ele será adicionado à sua bancada.</p>
-        
-        <div className="bg-white p-4 rounded-lg border-2 border-gray-300 inline-block my-4 shadow-inner">
-            <p className="text-lg">Custo de Criação: <span className="font-bold text-red-600">R$ 50</span></p>
+    <div className="text-black h-full flex flex-col p-4 bg-gray-100">
+        <div className="text-center mb-4">
+            <h3 className="text-2xl font-bold text-gray-800">Oficina de Criação</h3>
+            <p className="text-gray-600">Escolha um projeto para montar um novo dispositivo do zero.</p>
         </div>
-        
-        <button
-            onClick={onCraftDevice}
-            className="mt-6 bg-cyan-500 text-white font-bold py-3 px-10 rounded-md border-2 border-b-cyan-700 border-r-cyan-700 border-t-cyan-400 border-l-cyan-400 hover:bg-cyan-600 active:border-t-cyan-700 active:border-l-cyan-700 transition-all text-lg"
-        >
-            Iniciar Criação
-        </button>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {CREATABLE_DEVICES.map(device => {
+                const Icon = device.icon;
+                return (
+                    <div key={device.type} className="bg-white border-2 border-gray-300 rounded-lg p-4 flex flex-col text-center shadow hover:shadow-lg transition-shadow">
+                        <Icon className="w-16 h-16 mx-auto text-cyan-600 mb-3" />
+                        <h4 className="font-bold text-md mb-1">{device.name}</h4>
+                        <p className="text-sm text-gray-500 mb-4">Custo: <span className="font-bold text-red-600">R$ {CRAFTING_COST}</span></p>
+                        <button
+                            onClick={() => onCraftDevice(device.type)}
+                            className="mt-auto bg-cyan-500 text-white font-bold py-2 px-4 rounded-md border-b-2 border-cyan-700 hover:bg-cyan-600 active:bg-cyan-700 transition-all text-sm"
+                        >
+                            Criar
+                        </button>
+                    </div>
+                );
+            })}
+        </div>
     </div>
 );
 
