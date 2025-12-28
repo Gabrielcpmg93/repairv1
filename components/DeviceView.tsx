@@ -181,9 +181,11 @@ const PartMeshComponent: React.FC<{ part: DevicePart; size: [number, number, num
                          <mesh position={[-0.6, 0.45, 0.1]} rotation={[0, 0, -0.15]}><planeGeometry args={[1, 0.08]} /><meshStandardMaterial color={accentColor} /></mesh>
 
                         {/* Rear Suspension Assembly */}
-                        <mesh position={[0.85, -0.45, 0]} rotation={[0, 0, -0.15]}><RoundedBox args={[1.5, 0.12, 0.12]} radius={0.04}><meshStandardMaterial {...materialProps} color={frameColor} /></RoundedBox></mesh> {/* Chain Stay */}
-                        <mesh position={[0.9, -0.1, 0]} rotation={[0, 0, 0.6]}><RoundedBox args={[1.4, 0.12, 0.12]} radius={0.04}><meshStandardMaterial {...materialProps} color={frameColor} /></RoundedBox></mesh> {/* Seat Stay */}
-                        <mesh position={[0.1, -0.3, 0]}><cylinderGeometry args={[0.1, 0.1, 0.2, 16]} rotation={[Math.PI / 2, 0, 0]}/><meshStandardMaterial color="grey"/></mesh> {/* Pivot */}
+                        <mesh position={[0.85, -0.45, 0.1]} rotation={[0, 0, -0.15]}><RoundedBox args={[1.5, 0.12, 0.12]} radius={0.04}><meshStandardMaterial {...materialProps} color={frameColor} /></RoundedBox></mesh> {/* Chain Stay R */}
+                        <mesh position={[0.85, -0.45, -0.1]} rotation={[0, 0, -0.15]}><RoundedBox args={[1.5, 0.12, 0.12]} radius={0.04}><meshStandardMaterial {...materialProps} color={frameColor} /></RoundedBox></mesh> {/* Chain Stay L */}
+                        <mesh position={[0.9, -0.1, 0.1]} rotation={[0, 0, 0.6]}><RoundedBox args={[1.4, 0.12, 0.12]} radius={0.04}><meshStandardMaterial {...materialProps} color={frameColor} /></RoundedBox></mesh> {/* Seat Stay R */}
+                        <mesh position={[0.9, -0.1, -0.1]} rotation={[0, 0, 0.6]}><RoundedBox args={[1.4, 0.12, 0.12]} radius={0.04}><meshStandardMaterial {...materialProps} color={frameColor} /></RoundedBox></mesh> {/* Seat Stay L */}
+                        <mesh position={[0.1, -0.3, 0]}><cylinderGeometry args={[0.1, 0.1, 0.3, 16]} rotation={[Math.PI / 2, 0, 0]}/><meshStandardMaterial color="grey"/></mesh> {/* Pivot */}
 
                         {/* Shock Absorber */}
                         <group position={[-0.2, 0.15, 0]} rotation={[0, 0, 0.6]}>
@@ -192,9 +194,9 @@ const PartMeshComponent: React.FC<{ part: DevicePart; size: [number, number, num
                         </group>
 
                         {/* Seat */}
-                        <group position={[0.15, 0.7, 0]}>
-                            <mesh position={[0, -0.2, 0]} rotation={[0,0,-1.3]}><cylinderGeometry args={[0.05, 0.05, 0.5, 16]} /><meshStandardMaterial color="#333" /></mesh>
-                            <mesh position={[0.0, 0.1, 0]} rotation={[0,0,0.2]}><RoundedBox args={[0.6, 0.1, 0.25]} radius={0.03}><meshStandardMaterial color={frameColor} /></RoundedBox></mesh>
+                        <group position={[0.1, 0.6, 0]}>
+                            <mesh position={[0, -0.2, 0]}><cylinderGeometry args={[0.05, 0.05, 0.5, 16]} /><meshStandardMaterial color="#333" /></mesh>
+                            <mesh position={[0, 0.1, 0]} rotation={[0,0,0.1]}><RoundedBox args={[0.6, 0.1, 0.25]} radius={0.03}><meshStandardMaterial color={frameColor} /></RoundedBox></mesh>
                         </group>
                     </group>
                 );
@@ -202,18 +204,18 @@ const PartMeshComponent: React.FC<{ part: DevicePart; size: [number, number, num
                 const tireRadius = size[0] / 2;
                 const tireTubeRadius = 0.05;
                 return (
-                    <group>
-                        <mesh rotation={[0, Math.PI / 2, 0]}>
+                    <group rotation={[Math.PI / 2, 0, 0]}>
+                        <mesh rotation={[0, 0, 0]}>
                             <torusGeometry args={[tireRadius, tireTubeRadius, 16, 100]} />
                             <meshStandardMaterial color={isDetachedAndBroken ? '#ff4d4d' : '#111827'} />
                         </mesh>
                         <mesh>
-                            <cylinderGeometry args={[0.05, 0.05, 0.1, 16]} rotation={[0,0,Math.PI/2]} />
+                            <cylinderGeometry args={[0.05, 0.05, 0.1, 16]} rotation={[0,Math.PI/2,0]} />
                             <meshStandardMaterial color="#6b7280" />
                         </mesh>
                         {[...Array(24)].map((_, i) => (
-                            <mesh key={i} rotation={[0, 0, (i * Math.PI) / 12]}>
-                                <boxGeometry args={[tireRadius * 2, 0.01, 0.01]} />
+                            <mesh key={i} rotation={[(i * Math.PI) / 12, 0, 0]}>
+                                <cylinderGeometry args={[0.01, 0.01, tireRadius * 2, 4]} />
                                 <meshStandardMaterial color="#9ca3af" />
                             </mesh>
                         ))}
@@ -265,18 +267,16 @@ const PartMeshComponent: React.FC<{ part: DevicePart; size: [number, number, num
             case PartType.PEDALS:
                 return (
                     <group>
-                        <mesh position={[0,0.17,0.1]}>
-                            <boxGeometry args={[0.3, 0.1, 0.05]} />
-                            <meshStandardMaterial {...materialProps} />
-                        </mesh>
-                        <mesh position={[0,-0.17,-0.1]}>
-                            <boxGeometry args={[0.3, 0.1, 0.05]} />
-                            <meshStandardMaterial {...materialProps} />
-                        </mesh>
-                        <mesh>
-                            <boxGeometry args={[0.05, 0.35, 0.05]} />
-                            <meshStandardMaterial color="#333" />
-                        </mesh>
+                        {/* Crank Arm 1 */}
+                        <group position={[0, 0, 0.07]}>
+                            <mesh><boxGeometry args={[0.05, 0.4, 0.05]} /><meshStandardMaterial color="#333" /></mesh>
+                            <mesh position={[0,-0.2, 0]}><boxGeometry args={[0.3, 0.1, 0.05]} /><meshStandardMaterial {...materialProps} /></mesh>
+                        </group>
+                         {/* Crank Arm 2 */}
+                        <group position={[0, 0, -0.07]} rotation={[0,0,Math.PI]}>
+                            <mesh><boxGeometry args={[0.05, 0.4, 0.05]} /><meshStandardMaterial color="#333" /></mesh>
+                            <mesh position={[0,-0.2, 0]}><boxGeometry args={[0.3, 0.1, 0.05]} /><meshStandardMaterial {...materialProps} /></mesh>
+                        </group>
                     </group>
                 );
             default:

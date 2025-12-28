@@ -221,41 +221,38 @@ export default function useGameLogic() {
     const sellPart = useCallback((partType: PartType, price: number) => {
         if (!partType || price <= 0) {
             console.error("Tentativa de venda inválida.", { partType, price });
-            return false;
+            return;
         }
-
-        let success = false;
+    
+        const partIndex = state.workbenchParts.findIndex(p => p.type === partType);
+    
+        if (partIndex === -1) {
+            alert("Peça não encontrada no inventário!");
+            return;
+        }
+    
         const saleId = `${partType}-${Date.now()}`;
         
+        // Update state to remove part and add to selling list
         setState(prevState => {
-            const partIndex = prevState.workbenchParts.findIndex(p => p.type === partType);
-            if (partIndex === -1) {
-                return prevState;
-            }
-            success = true;
-            const newWorkbenchParts = [...prevState.workbenchParts];
-            newWorkbenchParts.splice(partIndex, 1);
-            const newSellingItem = { part: partType, price, id: saleId };
+            const updatedWorkbenchParts = [...prevState.workbenchParts];
+            updatedWorkbenchParts.splice(partIndex, 1);
             return {
                 ...prevState,
-                workbenchParts: newWorkbenchParts,
-                sellingItems: [...prevState.sellingItems, newSellingItem],
+                workbenchParts: updatedWorkbenchParts,
+                sellingItems: [...prevState.sellingItems, { part: partType, price, id: saleId }],
             };
         });
-
-        if (success) {
-            setTimeout(() => {
-                setState(prevState => ({
-                    ...prevState,
-                    money: prevState.money + price,
-                    sellingItems: prevState.sellingItems.filter(item => item.id !== saleId),
-                }));
-            }, 2000);
-        } else {
-             alert("Peça não encontrada no inventário!");
-        }
-        return success;
-    }, []);
+    
+        // After a delay, complete the transaction
+        setTimeout(() => {
+            setState(prevState => ({
+                ...prevState,
+                money: prevState.money + price,
+                sellingItems: prevState.sellingItems.filter(item => item.id !== saleId),
+            }));
+        }, 2000);
+    }, [state.workbenchParts, state.money]);
 
     const togglePartAttachment = useCallback((partId: string) => {
         setState(prevState => {
